@@ -1,0 +1,41 @@
+---
+import { categoryStyles, type CategorySlug, getCategoryTitle } from '../data/site'
+
+interface Props {
+  href: string
+  title: string
+  description: string
+  pubDate: Date
+  category: CategorySlug
+  tags?: string[]
+  featured?: boolean
+}
+
+const { href, title, description, pubDate, category, tags = [], featured = false } = Astro.props
+
+const dateLabel = new Intl.DateTimeFormat('ko-KR', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+}).format(pubDate)
+---
+
+<article class:list={['post-card', { featured }]}>
+  <div class="post-meta-row">
+    <span class:list={['pill', categoryStyles[category] ?? 'is-slate']}>{getCategoryTitle(category)}</span>
+    <time datetime={pubDate.toISOString()}>{dateLabel}</time>
+  </div>
+
+  <a class="post-card-link" href={href}>
+    <h3>{title}</h3>
+    <p>{description}</p>
+  </a>
+
+  {tags.length > 0 && (
+    <ul class="tag-list" aria-label="태그">
+      {tags.map((tag) => (
+        <li>#{tag}</li>
+      ))}
+    </ul>
+  )}
+</article>

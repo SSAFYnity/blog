@@ -1,0 +1,97 @@
+---
+import { getCollection } from 'astro:content'
+import BaseLayout from '../layouts/BaseLayout.astro'
+import { categoryStyles, getCategoryTitle, site } from '../data/site'
+import { getFeaturedPost, isPublicPost } from '../lib/content'
+
+const posts = (await getCollection('posts'))
+  .filter(isPublicPost)
+  .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime())
+
+const featured = getFeaturedPost(posts)
+const leadPosts = posts.filter((post) => post.data.category !== 'review').slice(0, 6)
+---
+
+<BaseLayout title={`${site.title} | 공식 콘텐츠 아카이브`} description={site.description}>
+  <section class="redesign-hero shell">
+    <div class="redesign-hero-head">
+      <div class="redesign-kicker">Official Blog</div>
+      <p class="redesign-overline">SSAFYnity Archive</p>
+      <h1>
+        <span class="hero-title-line">SSAFYnity의 소식과 시간을</span>
+        <span class="hero-title-line">차분하게 쌓아가는 공간입니다.</span>
+      </h1>
+      <p class="redesign-intro">
+        SSAFYnity 블로그는 공지, 일지, 기술, 후기, 회비 기록을 한데 모아 공동체의 시간을 차분하게 축적하는 공간입니다.
+      </p>
+    </div>
+
+    <div class="redesign-hero-grid">
+      {featured && (
+        <a class="hero-main-story" href={`/blog/${featured.slug}/`}>
+          <div class="hero-main-top">
+            <span class="eyebrow">Featured</span>
+            <span class={`pill ${categoryStyles[featured.data.category]}`}>
+              {getCategoryTitle(featured.data.category)}
+            </span>
+          </div>
+          <h2>{featured.data.title}</h2>
+          <p>{featured.data.description}</p>
+          {featured.data.tags.length > 0 && (
+            <div class="hero-main-tags">
+              {featured.data.tags.slice(0, 3).map((tag) => (
+                <span>#{tag}</span>
+              ))}
+            </div>
+          )}
+        </a>
+      )}
+
+      <div class="hero-category-rail">
+        {site.categories.map((category) => (
+          <a class="hero-category-link" href={`/blog/category/${category.slug}/`}>
+            <span>{category.title}</span>
+            <small>{category.description}</small>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="shell section redesign-latest">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Latest</p>
+        <h2>최근 올라온 글</h2>
+      </div>
+    </div>
+
+    {leadPosts.length > 0 ? (
+      <div class="redesign-latest-list">
+        {leadPosts.map((post) => (
+          <a class="redesign-latest-item" href={`/blog/${post.slug}/`}>
+            <div class="redesign-latest-date">
+              {new Intl.DateTimeFormat('ko-KR', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+              }).format(post.data.pubDate)}
+            </div>
+            <div class="redesign-latest-copy">
+              <span class={`pill ${categoryStyles[post.data.category]}`}>
+                {getCategoryTitle(post.data.category)}
+              </span>
+              <strong>{post.data.title}</strong>
+              <p>{post.data.description}</p>
+            </div>
+          </a>
+        ))}
+      </div>
+    ) : (
+      <div class="archive-empty-state home-empty-state">
+        <strong>최근 공개된 글이 아직 없습니다.</strong>
+        <p>첫 번째 공지, 기술, 회비 기록이 올라오면 이곳에서 바로 확인할 수 있습니다.</p>
+      </div>
+    )}
+  </section>
+</BaseLayout>

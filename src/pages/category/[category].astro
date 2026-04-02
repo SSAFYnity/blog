@@ -1,0 +1,715 @@
+---
+import { getCollection, render } from 'astro:content'
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import PostCard from '../../components/PostCard.astro'
+import { categoryMap, categoryStyles, getCategoryTitle, site } from '../../data/site'
+import { eventArchiveMap, eventKindLabels, getEventArchiveUrl } from '../../data/eventArchive'
+import { isPublicPost } from '../../lib/content'
+
+export async function getStaticPaths() {
+  return site.categories.map((category) => ({
+    params: { category: category.slug },
+    props: { category },
+  }))
+}
+
+const { category } = Astro.props
+
+const posts = (await getCollection('posts'))
+  .filter((post) => isPublicPost(post) && post.data.category === category.slug)
+  .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime())
+
+const categoryInfo = categoryMap[category.slug]
+
+const renderedPosts = await Promise.all(
+  posts.map(async (post) => ({
+    post,
+    ...(await render(post)),
+  }))
+)
+
+const dateLabel = (date: Date) =>
+  new Intl.DateTimeFormat('ko-KR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  }).format(date)
+
+const formatReviewAuthor = (review?: {
+  authorType: 'member' | 'guest'
+  name: string
+  campus?: string
+  cohort?: string
+}) => {
+  if (!review) return null
+  if (review.authorType === 'member') {
+    return [review.name, review.campus, review.cohort].filter(Boolean).join(' · ')
+  }
+
+  return review.name
+}
+
+const toSearchText = (post: (typeof posts)[number]) => {
+  const reviewBits =
+    post.data.review?.authorType === 'member'
+      ? [
+          post.data.review.name,
+          post.data.review.campus,
+          post.data.review.cohort,
+          post.data.review.eventSlug ? eventArchiveMap[post.data.review.eventSlug]?.title : '',
+        ]
+      : [
+          post.data.review?.name,
+          post.data.review?.eventSlug ? eventArchiveMap[post.data.review.eventSlug]?.title : '',
+        ]
+
+  return [
+    post.data.title,
+    post.data.description,
+    ...post.data.tags,
+    ...reviewBits,
+    post.body,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase()
+}
+
+const yearOptions = [
+  { value: '2026', label: '2026(5대)' },
+  { value: '2025', label: '2025(4대)' },
+  { value: '2024', label: '2024(3대)' },
+  { value: '2023', label: '2023(2대)' },
+  { value: '2022', label: '2022(1대)' },
+] as const
+
+const reviewKindOptions =
+  category.slug === 'review'
+    ? (Object.keys(eventKindLabels) as Array<keyof typeof eventKindLabels>)
+    : []
+
+const reviewColumns =
+  category.slug === 'review'
+    ? Array.from({ length: 3 }, (_, columnIndex) =>
+        renderedPosts.filter((_, index) => index % 3 === columnIndex)
+      )
+    : []
+
+const emptyMessages = {
+  notice: '아직 등록된 공지 글이 없습니다. 운영 공지와 주요 안내는 이곳에 차례로 아카이브됩니다.',
+  journal: '아직 추가로 아카이브된 일지가 없습니다. 행사와 운영 기록은 이곳에 차분히 쌓일 예정입니다.',
+  tech: '아직 등록된 기술 글이 없습니다. 세미나 정리와 개발 경험, 학습 기록이 이곳에 모이게 됩니다.',
+  review: '아직 등록된 후기 글이 없습니다. 참여자의 경험과 소감은 준비되는 대로 이곳에 공개됩니다.',
+  finance: '아직 등록된 회비 글이 없습니다. 회비 집행 기록과 운영 내역은 이곳에 정리됩니다.',
+} as const
+---
+
+<BaseLayout
+  title={`${categoryInfo.title} | SSAFYnity 블로그`}
+  description={categoryInfo.description}
+>
+  <section class="archive-hero shell">
+    <p class="eyebrow">Category</p>
+    <h1>{categoryInfo.title}</h1>
+    <p class="archive-copy">{categoryInfo.description}</p>
+  </section>
+
+  <section class="shell section archive-section">
+    {posts.length > 0 && <div class="archive-controls">
+      {category.slug === 'review' && (
+        <div class="archive-dropdown" data-dropdown>
+          <button type="button" class="archive-pill-button" data-dropdown-trigger data-filter-kind-trigger>
+            종류
+          </button>
+          <div class="archive-dropdown-menu" data-dropdown-menu hidden>
+            <button type="button" class="archive-dropdown-option is-selected" data-filter-kind-option data-value="">
+              전체 종류
+            </button>
+            {reviewKindOptions.map((kind) => (
+              <button type="button" class="archive-dropdown-option" data-filter-kind-option data-value={kind}>
+                {eventKindLabels[kind]}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {category.slug === 'review' && (
+        <div class="archive-dropdown" data-dropdown>
+          <button type="button" class="archive-pill-button" data-dropdown-trigger data-filter-audience-trigger>
+            작성자
+          </button>
+          <div class="archive-dropdown-menu" data-dropdown-menu hidden>
+            <button type="button" class="archive-dropdown-option is-selected" data-filter-audience-option data-value="">
+              전체 작성자
+            </button>
+            <button type="button" class="archive-dropdown-option" data-filter-audience-option data-value="member">
+              회원
+            </button>
+            <button type="button" class="archive-dropdown-option" data-filter-audience-option data-value="guest">
+              외부인원
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div class="archive-dropdown" data-dropdown>
+        <button type="button" class="archive-pill-button" data-dropdown-trigger data-filter-year-trigger>
+          연도
+        </button>
+        <div class="archive-dropdown-menu" data-dropdown-menu hidden>
+          <button type="button" class="archive-dropdown-option is-selected" data-filter-year-option data-value="">
+            전체 연도
+          </button>
+          {yearOptions.map((year) => (
+            <button type="button" class="archive-dropdown-option" data-filter-year-option data-value={year.value}>
+              {year.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div class="archive-search">
+        <input
+          type="search"
+          placeholder={`${categoryInfo.title} 안에서 찾기`}
+          data-filter-search
+          aria-label={`${categoryInfo.title} 검색`}
+        />
+        <button type="button" class="archive-search-button" data-filter-submit>
+          검색
+        </button>
+      </div>
+
+      <div class="archive-dropdown" data-dropdown>
+        <button type="button" class="archive-pill-button" data-dropdown-trigger data-filter-sort-trigger>
+          최신순
+        </button>
+        <div class="archive-dropdown-menu" data-dropdown-menu hidden>
+          <button type="button" class="archive-dropdown-option is-selected" data-filter-sort-option data-value="newest">
+            최신순
+          </button>
+          <button type="button" class="archive-dropdown-option" data-filter-sort-option data-value="oldest">
+            오래된순
+          </button>
+        </div>
+      </div>
+
+      <button type="button" class="archive-reset" data-filter-reset hidden>
+        초기화
+      </button>
+    </div>}
+
+    {posts.length === 0 && (
+      <div class="archive-empty-state">
+        <strong>{categoryInfo.title} 카테고리는 아직 비어 있습니다.</strong>
+        <p>{emptyMessages[category.slug]}</p>
+      </div>
+    )}
+
+    {posts.length > 0 && category.slug === 'notice' && (
+      <div class="notice-list" data-filter-list>
+        {posts.map((post) => (
+          <a
+            class="notice-row"
+            href={`/blog/${post.slug}/`}
+            data-filter-item
+            data-date={post.data.pubDate.toISOString()}
+            data-year={String(post.data.pubDate.getFullYear())}
+            data-event=""
+            data-tags={post.data.tags.join('|')}
+            data-search={toSearchText(post)}
+          >
+            <div class="notice-row-date">{dateLabel(post.data.pubDate)}</div>
+            <div class="notice-row-body">
+              <span class={`pill ${categoryStyles[post.data.category]}`}>{getCategoryTitle(post.data.category)}</span>
+              <h2>{post.data.title}</h2>
+              <p>{post.data.description}</p>
+            </div>
+          </a>
+        ))}
+      </div>
+    )}
+
+    {posts.length > 0 && category.slug === 'journal' && (
+      <div class="activity-log" data-filter-list>
+        {posts.map((post) => (
+          <article
+            class="activity-entry"
+            data-filter-item
+            data-date={post.data.pubDate.toISOString()}
+            data-year={String(post.data.pubDate.getFullYear())}
+            data-event=""
+            data-tags={post.data.tags.join('|')}
+            data-search={toSearchText(post)}
+          >
+            <div class="activity-stamp">
+              <span>{dateLabel(post.data.pubDate)}</span>
+            </div>
+            <a class="activity-card" href={`/blog/${post.slug}/`}>
+              <span class={`pill ${categoryStyles[post.data.category]}`}>{getCategoryTitle(post.data.category)}</span>
+              <h2>{post.data.title}</h2>
+              <p>{post.data.description}</p>
+              {post.data.tags.length > 0 && (
+                <ul class="tag-list" aria-label="태그">
+                  {post.data.tags.map((tag) => (
+                    <li>#{tag}</li>
+                  ))}
+                </ul>
+              )}
+            </a>
+          </article>
+        ))}
+      </div>
+    )}
+
+    {posts.length > 0 && category.slug === 'tech' && (
+      <div class="post-grid" data-filter-list>
+        {posts.map((post) => (
+          <div
+            data-filter-item
+            data-date={post.data.pubDate.toISOString()}
+            data-year={String(post.data.pubDate.getFullYear())}
+            data-event=""
+            data-tags={post.data.tags.join('|')}
+            data-search={toSearchText(post)}
+          >
+            <PostCard
+              href={`/blog/${post.slug}/`}
+              title={post.data.title}
+              description={post.data.description}
+              pubDate={post.data.pubDate}
+              category={post.data.category}
+              tags={post.data.tags}
+            />
+          </div>
+        ))}
+      </div>
+    )}
+
+    {posts.length > 0 && category.slug === 'review' && (
+      <div class="review-feed" data-filter-list data-review-layout="columns">
+        {reviewColumns.map((column, columnIndex) => (
+          <div class="review-column" data-review-column data-column-index={columnIndex}>
+            {column.map(({ post, Content }) => (
+              <div
+                class="review-entry-shell"
+                data-review-shell
+                data-filter-item
+                data-date={post.data.pubDate.toISOString()}
+                data-year={String(post.data.pubDate.getFullYear())}
+                data-event={post.data.review?.eventSlug ?? ''}
+                data-kind={post.data.review?.eventSlug ? eventArchiveMap[post.data.review.eventSlug]?.kind ?? '' : ''}
+                data-audience={post.data.review?.authorType ?? ''}
+                data-tags={post.data.tags.join('|')}
+                data-search={toSearchText(post)}
+              >
+                <article
+                  id={post.slug}
+                  class="review-entry"
+                  data-review-entry
+                >
+                  <div class="review-entry-meta">
+                    {post.data.review?.eventSlug && (
+                      <a
+                        class="review-event-link"
+                        href={getEventArchiveUrl(post.data.review.eventSlug)}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {eventArchiveMap[post.data.review.eventSlug].title}
+                      </a>
+                    )}
+
+                    {post.data.review?.authorType && (
+                      <span
+                        class:list={[
+                          'review-audience-badge',
+                          post.data.review.authorType === 'member'
+                            ? 'is-member'
+                            : 'is-guest',
+                        ]}
+                      >
+                        {post.data.review.authorType === 'member' ? '회원' : '외부인원'}
+                      </span>
+                    )}
+
+                    {formatReviewAuthor(post.data.review) && (
+                      <span class="review-author">{formatReviewAuthor(post.data.review)}</span>
+                    )}
+                  </div>
+
+                  <div class="review-body" data-review-body>
+                    <div class="prose review-prose review-prose-only" data-review-body-inner>
+                      <Content />
+                    </div>
+                  </div>
+
+                  <div class="review-entry-foot">
+                    <time class="review-date" datetime={post.data.pubDate.toISOString()}>
+                      {dateLabel(post.data.pubDate)}
+                    </time>
+
+                    <div class="review-actions">
+                      <button class="review-toggle" type="button" data-review-toggle hidden>
+                        더보기
+                      </button>
+
+                      {post.data.review?.link && (
+                        <a
+                          class="review-anchor"
+                          href={post.data.review.link}
+                          target="_blank"
+                          rel="noreferrer"
+                          aria-label={`${post.data.review.name} 링크 열기`}
+                          title={`${post.data.review.name} 링크 열기`}
+                        >
+                          <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path
+                              d="M7 17 17 7M9 7h8v8"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="1.8"
+                            />
+                          </svg>
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </article>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    )}
+
+    {posts.length > 0 && category.slug === 'finance' && (
+      <div class="finance-list" data-filter-list>
+        {posts.map((post) => (
+          <article
+            class="finance-card"
+            data-filter-item
+            data-date={post.data.pubDate.toISOString()}
+            data-year={String(post.data.pubDate.getFullYear())}
+            data-event=""
+            data-tags={post.data.tags.join('|')}
+            data-search={toSearchText(post)}
+          >
+            <div class="finance-card-top">
+              <span class={`pill ${categoryStyles[post.data.category]}`}>{getCategoryTitle(post.data.category)}</span>
+              <time datetime={post.data.pubDate.toISOString()}>{dateLabel(post.data.pubDate)}</time>
+            </div>
+            <a href={`/blog/${post.slug}/`}>
+              <h2>{post.data.title}</h2>
+              <p>{post.data.description}</p>
+            </a>
+          </article>
+        ))}
+      </div>
+    )}
+
+    {posts.length > 0 && (
+      <div class="archive-empty-state is-filter-empty" data-filter-empty hidden>
+        <strong>조건에 맞는 글이 없습니다.</strong>
+        <p>검색어 또는 필터를 조정하면 다른 아카이브를 확인할 수 있습니다.</p>
+      </div>
+    )}
+  </section>
+</BaseLayout>
+
+<script is:inline>
+  const filterList = document.querySelector('[data-filter-list]')
+  const searchInput = document.querySelector('[data-filter-search]')
+  const searchSubmit = document.querySelector('[data-filter-submit]')
+  const kindTrigger = document.querySelector('[data-filter-kind-trigger]')
+  const audienceTrigger = document.querySelector('[data-filter-audience-trigger]')
+  const yearTrigger = document.querySelector('[data-filter-year-trigger]')
+  const sortTrigger = document.querySelector('[data-filter-sort-trigger]')
+  const kindOptions = [...document.querySelectorAll('[data-filter-kind-option]')]
+  const audienceOptions = [...document.querySelectorAll('[data-filter-audience-option]')]
+  const yearOptions = [...document.querySelectorAll('[data-filter-year-option]')]
+  const sortOptions = [...document.querySelectorAll('[data-filter-sort-option]')]
+  const resetButton = document.querySelector('[data-filter-reset]')
+  const emptyState = document.querySelector('[data-filter-empty]')
+
+  if (
+    filterList instanceof HTMLElement &&
+    searchInput instanceof HTMLInputElement &&
+    searchSubmit instanceof HTMLButtonElement &&
+    (!kindTrigger || kindTrigger instanceof HTMLButtonElement) &&
+    (!audienceTrigger || audienceTrigger instanceof HTMLButtonElement) &&
+    yearTrigger instanceof HTMLButtonElement &&
+    sortTrigger instanceof HTMLButtonElement &&
+    resetButton instanceof HTMLButtonElement
+  ) {
+    const items = [...filterList.querySelectorAll('[data-filter-item]')]
+    const reviewColumns = [...filterList.querySelectorAll('[data-review-column]')]
+    let activeQuery = ''
+    let activeKind = ''
+    let activeAudience = ''
+    let activeYear = ''
+    let activeSort = 'newest'
+
+    const getReviewColumnCount = () => {
+      if (!reviewColumns.length) return 0
+      if (window.matchMedia('(max-width: 900px)').matches) return 1
+      if (window.matchMedia('(max-width: 1100px)').matches) return 2
+      return 3
+    }
+
+    const redistributeReviewItems = (sortedItems) => {
+      if (!reviewColumns.length) return
+
+      const activeColumnCount = getReviewColumnCount()
+      reviewColumns.forEach((column, index) => {
+        if (!(column instanceof HTMLElement)) return
+        column.hidden = index >= activeColumnCount
+      })
+
+      const activeColumns = reviewColumns
+        .slice(0, activeColumnCount)
+        .filter((column) => column instanceof HTMLElement)
+
+      if (!activeColumns.length) return
+
+      const visibleItems = sortedItems.filter((item) => !item.hasAttribute('hidden'))
+      const hiddenItems = sortedItems.filter((item) => item.hasAttribute('hidden'))
+
+      visibleItems.forEach((item, index) => {
+        activeColumns[index % activeColumns.length].appendChild(item)
+      })
+
+      hiddenItems.forEach((item) => {
+        activeColumns[0].appendChild(item)
+      })
+    }
+
+    const applyFilters = () => {
+      const sorted = [...items].sort((a, b) => {
+        const aDate = Date.parse(a.getAttribute('data-date') ?? '')
+        const bDate = Date.parse(b.getAttribute('data-date') ?? '')
+        return activeSort === 'oldest' ? aDate - bDate : bDate - aDate
+      })
+
+      sorted.forEach((item) => {
+        const haystack = (item.getAttribute('data-search') ?? '').toLowerCase()
+        const kindValue = item.getAttribute('data-kind') ?? ''
+        const audienceValue = item.getAttribute('data-audience') ?? ''
+        const yearValue = item.getAttribute('data-year') ?? ''
+        const matchesQuery = !activeQuery || haystack.includes(activeQuery)
+        const matchesKind = !activeKind || kindValue === activeKind
+        const matchesAudience = !activeAudience || audienceValue === activeAudience
+        const matchesYear = !activeYear || yearValue === activeYear
+        const visible = matchesQuery && matchesKind && matchesAudience && matchesYear
+        item.toggleAttribute('hidden', !visible)
+      })
+
+      redistributeReviewItems(sorted)
+
+      if (emptyState instanceof HTMLElement) {
+        const visibleCount = items.filter((item) => !item.hasAttribute('hidden')).length
+        emptyState.hidden = visibleCount > 0
+      }
+
+      resetButton.hidden = !(activeQuery || activeKind || activeAudience || activeYear || activeSort !== 'newest')
+    }
+
+    const closeDropdowns = () => {
+      document.querySelectorAll('[data-dropdown-menu]').forEach((menu) => {
+        if (menu instanceof HTMLElement) menu.hidden = true
+      })
+    }
+
+    document.querySelectorAll('[data-dropdown]').forEach((dropdown) => {
+      const trigger = dropdown.querySelector('[data-dropdown-trigger]')
+      const menu = dropdown.querySelector('[data-dropdown-menu]')
+      if (!(trigger instanceof HTMLButtonElement) || !(menu instanceof HTMLElement)) return
+
+      trigger.addEventListener('click', () => {
+        const nextHidden = !menu.hidden
+        closeDropdowns()
+        menu.hidden = nextHidden
+      })
+    })
+
+    document.addEventListener('click', (event) => {
+      const target = event.target
+      if (!(target instanceof Element) || !target.closest('[data-dropdown]')) {
+        closeDropdowns()
+      }
+    })
+
+    const submitSearch = () => {
+      activeQuery = searchInput.value.trim().toLowerCase()
+      applyFilters()
+    }
+
+    searchSubmit.addEventListener('click', submitSearch)
+    searchInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') submitSearch()
+    })
+
+    sortOptions.forEach((option) => {
+      if (!(option instanceof HTMLButtonElement)) return
+      option.addEventListener('click', () => {
+        activeSort = option.dataset.value ?? 'newest'
+        sortTrigger.textContent = option.textContent?.trim() ?? '정렬'
+        sortOptions.forEach((candidate) => candidate.classList.toggle('is-selected', candidate === option))
+        closeDropdowns()
+        applyFilters()
+      })
+    })
+
+    kindOptions.forEach((option) => {
+      if (!(option instanceof HTMLButtonElement)) return
+      option.addEventListener('click', () => {
+        activeKind = option.dataset.value ?? ''
+        if (kindTrigger instanceof HTMLButtonElement) {
+          kindTrigger.textContent = activeKind ? option.textContent?.trim() ?? '종류' : '종류'
+        }
+        kindOptions.forEach((candidate) => candidate.classList.toggle('is-selected', candidate === option))
+        closeDropdowns()
+        applyFilters()
+      })
+    })
+
+    audienceOptions.forEach((option) => {
+      if (!(option instanceof HTMLButtonElement)) return
+      option.addEventListener('click', () => {
+        activeAudience = option.dataset.value ?? ''
+        if (audienceTrigger instanceof HTMLButtonElement) {
+          audienceTrigger.textContent = activeAudience ? option.textContent?.trim() ?? '작성자' : '작성자'
+        }
+        audienceOptions.forEach((candidate) => candidate.classList.toggle('is-selected', candidate === option))
+        closeDropdowns()
+        applyFilters()
+      })
+    })
+
+    yearOptions.forEach((option) => {
+      if (!(option instanceof HTMLButtonElement)) return
+      option.addEventListener('click', () => {
+        activeYear = option.dataset.value ?? ''
+        yearTrigger.textContent = activeYear ? option.textContent?.trim() ?? '연도' : '연도'
+        yearOptions.forEach((candidate) => candidate.classList.toggle('is-selected', candidate === option))
+        closeDropdowns()
+        applyFilters()
+      })
+    })
+
+    resetButton.addEventListener('click', () => {
+      activeQuery = ''
+      activeKind = ''
+      activeAudience = ''
+      activeYear = ''
+      activeSort = 'newest'
+      searchInput.value = ''
+      if (kindTrigger instanceof HTMLButtonElement) kindTrigger.textContent = '종류'
+      if (audienceTrigger instanceof HTMLButtonElement) audienceTrigger.textContent = '작성자'
+      yearTrigger.textContent = '연도'
+      sortTrigger.textContent = '최신순'
+      kindOptions.forEach((option) => option.classList.toggle('is-selected', (option.dataset.value ?? '') === ''))
+      audienceOptions.forEach((option) => option.classList.toggle('is-selected', (option.dataset.value ?? '') === ''))
+      yearOptions.forEach((option) => option.classList.toggle('is-selected', (option.dataset.value ?? '') === ''))
+      sortOptions.forEach((option) => option.classList.toggle('is-selected', option.dataset.value === 'newest'))
+      applyFilters()
+    })
+
+    applyFilters()
+    window.addEventListener('resize', applyFilters)
+  }
+
+  const reviewEntries = document.querySelectorAll('[data-review-entry]')
+
+  reviewEntries.forEach((entry) => {
+    const shell = entry.closest('[data-review-shell]')
+    const body = entry.querySelector('[data-review-body]')
+    const toggle = entry.querySelector('[data-review-toggle]')
+
+    if (
+      !(shell instanceof HTMLElement) ||
+      !(body instanceof HTMLElement) ||
+      !(toggle instanceof HTMLButtonElement)
+    ) {
+      return
+    }
+
+    const collapse = () => {
+      entry.classList.remove('is-expanded')
+      shell.style.height = ''
+      toggle.textContent = '더보기'
+      toggle.setAttribute('aria-expanded', 'false')
+    }
+
+    const sync = () => {
+      const wasExpanded = entry.classList.contains('is-expanded')
+      if (wasExpanded) {
+        entry.classList.remove('is-expanded')
+      }
+
+      const collapsedHeight = entry.offsetHeight
+      entry.dataset.collapsedHeight = String(collapsedHeight)
+
+      const overflowAmount = body.scrollHeight - body.clientHeight
+      const isOverflow = overflowAmount > 24
+      entry.classList.toggle('is-collapsible', isOverflow)
+      toggle.hidden = !isOverflow
+
+      if (isOverflow && wasExpanded) {
+        entry.classList.add('is-expanded')
+        shell.style.height = `${collapsedHeight}px`
+      } else if (!isOverflow) {
+        shell.style.height = ''
+      }
+
+      const expanded = entry.classList.contains('is-expanded')
+      toggle.textContent = expanded ? '접기' : '더보기'
+      toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false')
+    }
+
+    toggle.addEventListener('click', () => {
+      const shouldExpand = !entry.classList.contains('is-expanded')
+
+      reviewEntries.forEach((candidate) => {
+        if (!(candidate instanceof HTMLElement) || candidate === entry) return
+        const candidateShell = candidate.closest('[data-review-shell]')
+        const candidateToggle = candidate.querySelector('[data-review-toggle]')
+        if (
+          !(candidateShell instanceof HTMLElement) ||
+          !(candidateToggle instanceof HTMLButtonElement)
+        ) {
+          return
+        }
+
+        candidate.classList.remove('is-expanded')
+        candidateShell.style.height = ''
+        candidateToggle.textContent = '더보기'
+        candidateToggle.setAttribute('aria-expanded', 'false')
+      })
+
+      if (shouldExpand) {
+        const collapsedHeight = Number(entry.dataset.collapsedHeight || entry.offsetHeight)
+        shell.style.height = `${collapsedHeight}px`
+        entry.classList.add('is-expanded')
+      } else {
+        collapse()
+      }
+
+      const expanded = entry.classList.contains('is-expanded')
+      toggle.textContent = expanded ? '접기' : '더보기'
+      toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false')
+    })
+
+    requestAnimationFrame(sync)
+    setTimeout(sync, 120)
+    window.addEventListener('resize', sync)
+
+    if ('ResizeObserver' in window) {
+      const resizeObserver = new ResizeObserver(sync)
+      resizeObserver.observe(body)
+    }
+  })
+</script>

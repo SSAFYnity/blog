@@ -1,0 +1,33 @@
+---
+import { getCollection } from 'astro:content'
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import PostCard from '../../components/PostCard.astro'
+import { isPublicPost } from '../../lib/content'
+
+const posts = (await getCollection('posts'))
+  .filter(isPublicPost)
+  .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime())
+---
+
+<BaseLayout title="전체 글 | SSAFYnity 블로그" description="SSAFYnity 블로그의 전체 글 목록입니다.">
+  <section class="archive-hero shell">
+    <p class="eyebrow">All Posts</p>
+    <h1>전체 글</h1>
+    <p class="archive-copy">공지, 일지, 기술, 후기, 회비 기록을 한곳에서 모아볼 수 있습니다.</p>
+  </section>
+
+  <section class="shell section archive-section">
+    <div class="post-grid">
+      {posts.map((post) => (
+        <PostCard
+          href={`/blog/${post.slug}/`}
+          title={post.data.title}
+          description={post.data.description}
+          pubDate={post.data.pubDate}
+          category={post.data.category}
+          tags={post.data.tags}
+        />
+      ))}
+    </div>
+  </section>
+</BaseLayout>

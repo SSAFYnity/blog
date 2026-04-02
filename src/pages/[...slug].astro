@@ -1,0 +1,44 @@
+---
+import { getCollection, render } from 'astro:content'
+import BaseLayout from '../layouts/BaseLayout.astro'
+import { categoryStyles, getCategoryTitle } from '../data/site'
+import { isPublicPost } from '../lib/content'
+
+export async function getStaticPaths() {
+  const posts = (await getCollection('posts')).filter(isPublicPost)
+
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }))
+}
+
+const { post } = Astro.props
+const { Content } = await render(post)
+
+const dateLabel = new Intl.DateTimeFormat('ko-KR', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+}).format(post.data.pubDate)
+---
+
+<BaseLayout title={`${post.data.title} | SSAFYnity 블로그`} description={post.data.description}>
+  <article class:list={['post-detail shell', post.data.category === 'journal' && 'is-journal']}>
+    <header class="post-detail-header">
+      <div class="post-meta-row">
+        <span class:list={['pill', categoryStyles[post.data.category] ?? 'is-slate']}>
+          {getCategoryTitle(post.data.category)}
+        </span>
+        <time datetime={post.data.pubDate.toISOString()}>{dateLabel}</time>
+      </div>
+
+      <h1>{post.data.title}</h1>
+      <p class="post-description">{post.data.description}</p>
+    </header>
+
+    <div class="prose">
+      <Content />
+    </div>
+  </article>
+</BaseLayout>
