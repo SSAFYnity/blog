@@ -1,0 +1,28 @@
+---
+import { site } from '../data/site'
+---
+
+<footer class="site-footer">
+  <div class="shell footer-grid">
+    <div class="footer-block">
+      <p class="footer-eyebrow">SSAFYnity</p>
+      <h2>{site.title}</h2>
+      <p>{site.slogan}</p>
+    </div>
+
+    <div class="footer-block">
+      <p class="footer-eyebrow">Links</p>
+      <div class="footer-links">
+        <a href={site.links.home}>공식 홈페이지</a>
+        <a href={site.links.github}>GitHub</a>
+        <a href={site.links.instagram}>Instagram</a>
+        <a href={site.links.linkedin}>LinkedIn</a>
+        <a href={site.links.email}>문의하기</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="shell footer-meta">
+    <p>© {new Date().getFullYear()} SSAFYnity. All rights reserved.</p>
+  </div>
+</footer>
