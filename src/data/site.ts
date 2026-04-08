@@ -23,6 +23,16 @@ export const site = {
       showInFooter: true,
     },
     {
+      label: '카카오톡 채널',
+      href: 'https://pf.kakao.com/_GdeRX',
+      showInFooter: true,
+    },
+    {
+      label: '디스코드',
+      href: 'https://discord.gg/BzSF9xMfX6',
+      showInFooter: true,
+    },
+    {
       label: 'Instagram',
       href: 'https://www.instagram.com/ssafynity/',
       showInFooter: true,
