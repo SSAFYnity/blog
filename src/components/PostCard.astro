@@ -8,10 +8,9 @@ interface Props {
   pubDate: Date
   category: CategorySlug
   tags?: string[]
-  featured?: boolean
 }
 
-const { href, title, description, pubDate, category, tags = [], featured = false } = Astro.props
+const { href, title, description, pubDate, category, tags = [] } = Astro.props
 
 const dateLabel = new Intl.DateTimeFormat('ko-KR', {
   year: 'numeric',
@@ -20,7 +19,7 @@ const dateLabel = new Intl.DateTimeFormat('ko-KR', {
 }).format(pubDate)
 ---
 
-<article class:list={['post-card', { featured }]}>
+<article class="post-card">
   <div class="post-meta-row">
     <span class:list={['pill', categoryStyles[category] ?? 'is-slate']}>{getCategoryTitle(category)}</span>
     <time datetime={pubDate.toISOString()}>{dateLabel}</time>

@@ -8,7 +8,6 @@ const posts = defineCollection({
     pubDate: z.coerce.date(),
     category: z.enum(['tech', 'journal', 'review', 'notice', 'finance']),
     draft: z.boolean().default(false),
-    featured: z.boolean().default(false),
     tags: z.array(z.string()).default([]),
     review: z
       .object({
