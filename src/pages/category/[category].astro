@@ -2,8 +2,10 @@
 import { getCollection, render } from 'astro:content'
 import BaseLayout from '../../layouts/BaseLayout.astro'
 import PostCard from '../../components/PostCard.astro'
+import { archiveEmptyMessages, archiveFilterLabels, archiveYearOptions, reviewAudienceLabels } from '../../data/archive'
 import { categoryMap, categoryStyles, getCategoryTitle, site } from '../../data/site'
 import { eventArchiveMap, eventKindLabels, getEventArchiveUrl } from '../../data/eventArchive'
+import { buildArchiveSearchText, formatArchiveDate, formatReviewAuthor } from '../../lib/archive'
 import { isPublicPost } from '../../lib/content'
 
 export async function getStaticPaths() {
@@ -28,61 +30,6 @@ const renderedPosts = await Promise.all(
   }))
 )
 
-const dateLabel = (date: Date) =>
-  new Intl.DateTimeFormat('ko-KR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  }).format(date)
-
-const formatReviewAuthor = (review?: {
-  authorType: 'member' | 'guest'
-  name: string
-  campus?: string
-  cohort?: string
-}) => {
-  if (!review) return null
-  if (review.authorType === 'member') {
-    return [review.name, review.campus, review.cohort].filter(Boolean).join(' · ')
-  }
-
-  return review.name
-}
-
-const toSearchText = (post: (typeof posts)[number]) => {
-  const reviewBits =
-    post.data.review?.authorType === 'member'
-      ? [
-          post.data.review.name,
-          post.data.review.campus,
-          post.data.review.cohort,
-          post.data.review.eventSlug ? eventArchiveMap[post.data.review.eventSlug]?.title : '',
-        ]
-      : [
-          post.data.review?.name,
-          post.data.review?.eventSlug ? eventArchiveMap[post.data.review.eventSlug]?.title : '',
-        ]
-
-  return [
-    post.data.title,
-    post.data.description,
-    ...post.data.tags,
-    ...reviewBits,
-    post.body,
-  ]
-    .filter(Boolean)
-    .join(' ')
-    .toLowerCase()
-}
-
-const yearOptions = [
-  { value: '2026', label: '2026(5대)' },
-  { value: '2025', label: '2025(4대)' },
-  { value: '2024', label: '2024(3대)' },
-  { value: '2023', label: '2023(2대)' },
-  { value: '2022', label: '2022(1대)' },
-] as const
-
 const reviewKindOptions =
   category.slug === 'review'
     ? (Object.keys(eventKindLabels) as Array<keyof typeof eventKindLabels>)
@@ -95,35 +42,31 @@ const reviewColumns =
       )
     : []
 
-const emptyMessages = {
-  notice: '아직 등록된 공지 글이 없습니다. 운영 공지와 주요 안내는 이곳에 차례로 아카이브됩니다.',
-  journal: '아직 추가로 아카이브된 일지가 없습니다. 행사와 운영 기록은 이곳에 차분히 쌓일 예정입니다.',
-  tech: '아직 등록된 기술 글이 없습니다. 세미나 정리와 개발 경험, 학습 기록이 이곳에 모이게 됩니다.',
-  review: '아직 등록된 후기 글이 없습니다. 참여자의 경험과 소감은 준비되는 대로 이곳에 공개됩니다.',
-  finance: '아직 등록된 회비 글이 없습니다. 회비 집행 기록과 운영 내역은 이곳에 정리됩니다.',
-} as const
 ---
 
 <BaseLayout
   title={`${categoryInfo.title} | SSAFYnity 블로그`}
   description={categoryInfo.description}
 >
-  <section class="archive-hero shell">
-    <p class="eyebrow">Category</p>
-    <h1>{categoryInfo.title}</h1>
-    <p class="archive-copy">{categoryInfo.description}</p>
+  <section class="archive-hero-band">
+    <div class="archive-hero shell">
+      <p class="eyebrow">Category</p>
+      <h1>{categoryInfo.title}</h1>
+      <p class="archive-copy">{categoryInfo.description}</p>
+    </div>
   </section>
 
-  <section class="shell section archive-section">
+  <section class="section section-muted archive-section-band">
+    <div class="shell archive-section">
     {posts.length > 0 && <div class="archive-controls">
       {category.slug === 'review' && (
         <div class="archive-dropdown" data-dropdown>
           <button type="button" class="archive-pill-button" data-dropdown-trigger data-filter-kind-trigger>
-            종류
+            {archiveFilterLabels.reviewKind}
           </button>
           <div class="archive-dropdown-menu" data-dropdown-menu hidden>
             <button type="button" class="archive-dropdown-option is-selected" data-filter-kind-option data-value="">
-              전체 종류
+              {archiveFilterLabels.allKinds}
             </button>
             {reviewKindOptions.map((kind) => (
               <button type="button" class="archive-dropdown-option" data-filter-kind-option data-value={kind}>
@@ -137,17 +80,17 @@ const emptyMessages = {
       {category.slug === 'review' && (
         <div class="archive-dropdown" data-dropdown>
           <button type="button" class="archive-pill-button" data-dropdown-trigger data-filter-audience-trigger>
-            작성자
+            {archiveFilterLabels.audience}
           </button>
           <div class="archive-dropdown-menu" data-dropdown-menu hidden>
             <button type="button" class="archive-dropdown-option is-selected" data-filter-audience-option data-value="">
-              전체 작성자
+              {archiveFilterLabels.allAudiences}
             </button>
             <button type="button" class="archive-dropdown-option" data-filter-audience-option data-value="member">
-              회원
+              {archiveFilterLabels.memberAudience}
             </button>
             <button type="button" class="archive-dropdown-option" data-filter-audience-option data-value="guest">
-              외부인원
+              {archiveFilterLabels.guestAudience}
             </button>
           </div>
         </div>
@@ -155,13 +98,13 @@ const emptyMessages = {
 
       <div class="archive-dropdown" data-dropdown>
         <button type="button" class="archive-pill-button" data-dropdown-trigger data-filter-year-trigger>
-          연도
+          {archiveFilterLabels.year}
         </button>
         <div class="archive-dropdown-menu" data-dropdown-menu hidden>
           <button type="button" class="archive-dropdown-option is-selected" data-filter-year-option data-value="">
-            전체 연도
+            {archiveFilterLabels.allYears}
           </button>
-          {yearOptions.map((year) => (
+          {archiveYearOptions.map((year) => (
             <button type="button" class="archive-dropdown-option" data-filter-year-option data-value={year.value}>
               {year.label}
             </button>
@@ -177,33 +120,33 @@ const emptyMessages = {
           aria-label={`${categoryInfo.title} 검색`}
         />
         <button type="button" class="archive-search-button" data-filter-submit>
-          검색
+          {archiveFilterLabels.searchButton}
         </button>
       </div>
 
       <div class="archive-dropdown" data-dropdown>
         <button type="button" class="archive-pill-button" data-dropdown-trigger data-filter-sort-trigger>
-          최신순
+          {archiveFilterLabels.newest}
         </button>
         <div class="archive-dropdown-menu" data-dropdown-menu hidden>
           <button type="button" class="archive-dropdown-option is-selected" data-filter-sort-option data-value="newest">
-            최신순
+            {archiveFilterLabels.newest}
           </button>
           <button type="button" class="archive-dropdown-option" data-filter-sort-option data-value="oldest">
-            오래된순
+            {archiveFilterLabels.oldest}
           </button>
         </div>
       </div>
 
       <button type="button" class="archive-reset" data-filter-reset hidden>
-        초기화
+        {archiveFilterLabels.reset}
       </button>
     </div>}
 
     {posts.length === 0 && (
       <div class="archive-empty-state">
         <strong>{categoryInfo.title} 카테고리는 아직 비어 있습니다.</strong>
-        <p>{emptyMessages[category.slug]}</p>
+        <p>{archiveEmptyMessages[category.slug]}</p>
       </div>
     )}
 
@@ -218,9 +161,9 @@ const emptyMessages = {
             data-year={String(post.data.pubDate.getFullYear())}
             data-event=""
             data-tags={post.data.tags.join('|')}
-            data-search={toSearchText(post)}
+            data-search={buildArchiveSearchText(post)}
           >
-            <div class="notice-row-date">{dateLabel(post.data.pubDate)}</div>
+            <div class="notice-row-date">{formatArchiveDate(post.data.pubDate)}</div>
             <div class="notice-row-body">
               <span class={`pill ${categoryStyles[post.data.category]}`}>{getCategoryTitle(post.data.category)}</span>
               <h2>{post.data.title}</h2>
@@ -241,10 +184,10 @@ const emptyMessages = {
             data-year={String(post.data.pubDate.getFullYear())}
             data-event=""
             data-tags={post.data.tags.join('|')}
-            data-search={toSearchText(post)}
+            data-search={buildArchiveSearchText(post)}
           >
             <div class="activity-stamp">
-              <span>{dateLabel(post.data.pubDate)}</span>
+              <span>{formatArchiveDate(post.data.pubDate)}</span>
             </div>
             <a class="activity-card" href={`/blog/${post.slug}/`}>
               <span class={`pill ${categoryStyles[post.data.category]}`}>{getCategoryTitle(post.data.category)}</span>
@@ -272,7 +215,7 @@ const emptyMessages = {
             data-year={String(post.data.pubDate.getFullYear())}
             data-event=""
             data-tags={post.data.tags.join('|')}
-            data-search={toSearchText(post)}
+            data-search={buildArchiveSearchText(post)}
           >
             <PostCard
               href={`/blog/${post.slug}/`}
@@ -302,7 +245,7 @@ const emptyMessages = {
                 data-kind={post.data.review?.eventSlug ? eventArchiveMap[post.data.review.eventSlug]?.kind ?? '' : ''}
                 data-audience={post.data.review?.authorType ?? ''}
                 data-tags={post.data.tags.join('|')}
-                data-search={toSearchText(post)}
+                data-search={buildArchiveSearchText(post)}
               >
                 <article
                   id={post.slug}
@@ -330,7 +273,7 @@ const emptyMessages = {
                             : 'is-guest',
                         ]}
                       >
-                        {post.data.review.authorType === 'member' ? '회원' : '외부인원'}
+                        {reviewAudienceLabels[post.data.review.authorType]}
                       </span>
                     )}
 
@@ -347,7 +290,7 @@ const emptyMessages = {
 
                   <div class="review-entry-foot">
                     <time class="review-date" datetime={post.data.pubDate.toISOString()}>
-                      {dateLabel(post.data.pubDate)}
+                      {formatArchiveDate(post.data.pubDate)}
                     </time>
 
                     <div class="review-actions">
@@ -396,11 +339,11 @@ const emptyMessages = {
             data-year={String(post.data.pubDate.getFullYear())}
             data-event=""
             data-tags={post.data.tags.join('|')}
-            data-search={toSearchText(post)}
+            data-search={buildArchiveSearchText(post)}
           >
             <div class="finance-card-top">
               <span class={`pill ${categoryStyles[post.data.category]}`}>{getCategoryTitle(post.data.category)}</span>
-              <time datetime={post.data.pubDate.toISOString()}>{dateLabel(post.data.pubDate)}</time>
+              <time datetime={post.data.pubDate.toISOString()}>{formatArchiveDate(post.data.pubDate)}</time>
             </div>
             <a href={`/blog/${post.slug}/`}>
               <h2>{post.data.title}</h2>
@@ -413,10 +356,11 @@ const emptyMessages = {
 
     {posts.length > 0 && (
       <div class="archive-empty-state is-filter-empty" data-filter-empty hidden>
-        <strong>조건에 맞는 글이 없습니다.</strong>
-        <p>검색어 또는 필터를 조정하면 다른 아카이브를 확인할 수 있습니다.</p>
+        <strong>{archiveFilterLabels.filteredEmptyTitle}</strong>
+        <p>{archiveFilterLabels.filteredEmptyDescription}</p>
       </div>
     )}
+    </div>
   </section>
 </BaseLayout>
 

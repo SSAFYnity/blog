@@ -4,6 +4,10 @@ import { site } from '../data/site'
 const currentPath = Astro.url.pathname
 
 const navItems = [
+  {
+    label: '전체 글',
+    href: '/blog/posts/',
+  },
   ...site.categories.map((category) => ({
     label: category.title,
     href: `/blog/category/${category.slug}/`,
@@ -15,7 +19,7 @@ const isActive = (href: string) => {
 }
 ---
 
-<header class="site-header">
+<header class="site-header" data-site-header>
   <div class="shell header-inner">
     <a class="brand" href="/blog/" aria-label={`${site.shortName} 블로그 홈`}>
       <img class="brand-logo" src="/blog/logo-rect.png" alt="SSAFYnity" />
@@ -39,3 +43,16 @@ const isActive = (href: string) => {
     </nav>
   </div>
 </header>
+
+<script>
+  const header = document.querySelector<HTMLElement>('[data-site-header]')
+
+  if (header) {
+    const syncScrolled = () => {
+      header.classList.toggle('is-scrolled', window.scrollY > 20)
+    }
+
+    syncScrolled()
+    window.addEventListener('scroll', syncScrolled, { passive: true })
+  }
+</script>

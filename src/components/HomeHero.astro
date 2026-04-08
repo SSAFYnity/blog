@@ -1,0 +1,38 @@
+---
+interface Props {
+  postsCount: number
+  categoriesCount: number
+}
+
+const { postsCount, categoriesCount } = Astro.props
+---
+
+<section class="hero-band">
+  <div class="redesign-hero shell">
+    <div class="redesign-hero-head">
+      <div class="redesign-kicker">✦ SSAFYnity 공식 아카이브</div>
+      <h1>
+        <span class="hero-title-line">SSAFYnity의 기록이</span>
+        <span class="hero-title-line hero-title-accent">계속되는 공간</span>
+      </h1>
+      <p class="redesign-intro">
+        공지, 일지, 기술, 후기, 회비 기록을 함께 쌓아가는 공식 아카이브입니다.
+      </p>
+
+      <div class="hero-stat-row">
+        <div>
+          <span>공개 글</span>
+          <strong>{postsCount}개</strong>
+        </div>
+        <div>
+          <span>카테고리</span>
+          <strong>{categoriesCount}개</strong>
+        </div>
+        <div>
+          <span>참여 가능</span>
+          <strong>후기 작성</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

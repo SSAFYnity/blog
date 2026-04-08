@@ -1,0 +1,57 @@
+---
+import type { CollectionEntry } from 'astro:content'
+
+import { categoryStyles, getCategoryTitle } from '../data/site'
+
+interface Props {
+  posts: CollectionEntry<'posts'>[]
+}
+
+const { posts } = Astro.props
+---
+
+<section class="section section-muted redesign-latest-band">
+  <div class="shell redesign-latest">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Latest</p>
+        <h2>최근 올라온 글</h2>
+        <p class="section-copy">
+          공지와 기록, 기술 공유 가운데 가장 먼저 공개된 글부터 차분하게 살펴볼 수 있습니다.
+        </p>
+      </div>
+      <a class="section-link" href="/blog/posts/">전체 글 보기</a>
+    </div>
+
+    {posts.length > 0 ? (
+      <div class="redesign-latest-layout">
+        {posts.map((post) => (
+          <a class="redesign-latest-item" href={`/blog/${post.slug}/`}>
+            <div class="redesign-latest-copy">
+              <div class="redesign-latest-item-meta">
+                <span class={`pill ${categoryStyles[post.data.category]}`}>
+                  {getCategoryTitle(post.data.category)}
+                </span>
+                <span class="redesign-latest-date">
+                  {new Intl.DateTimeFormat('ko-KR', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                  }).format(post.data.pubDate)}
+                </span>
+              </div>
+              <strong>{post.data.title}</strong>
+              <p>{post.data.description}</p>
+              <span class="redesign-latest-item-link">읽어보기</span>
+            </div>
+          </a>
+        ))}
+      </div>
+    ) : (
+      <div class="archive-empty-state home-empty-state">
+        <strong>최근 공개된 글이 아직 없습니다.</strong>
+        <p>첫 번째 공지, 기술, 회비 기록이 올라오면 이곳에서 바로 확인할 수 있습니다.</p>
+      </div>
+    )}
+  </div>
+</section>

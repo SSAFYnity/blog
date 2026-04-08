@@ -1,0 +1,79 @@
+---
+import { type Category } from '../data/site'
+
+interface Props {
+  categories: readonly Category[]
+}
+
+const { categories } = Astro.props
+
+const categoryVisuals: Record<
+  Category['slug'],
+  {
+    label: string
+    iconClass: string
+    iconPath: string
+  }
+> = {
+  notice: {
+    label: 'Notice',
+    iconClass: 'is-navy',
+    iconPath: 'M14.25 18a2.25 2.25 0 0 1-4.5 0m7.5-7.5V9a5.25 5.25 0 1 0-10.5 0v1.5L5.25 13.5h13.5l-1.5-3Z',
+  },
+  journal: {
+    label: 'Journal',
+    iconClass: 'is-sky',
+    iconPath: 'M6.75 4.5A2.25 2.25 0 0 0 4.5 6.75v10.5A2.25 2.25 0 0 0 6.75 19.5h10.5a2.25 2.25 0 0 0 2.25-2.25V8.56a2.25 2.25 0 0 0-.66-1.59l-1.81-1.81a2.25 2.25 0 0 0-1.59-.66H6.75Zm2.25 3h6m-6 3h6m-6 3h3',
+  },
+  tech: {
+    label: 'Tech',
+    iconClass: 'is-blue',
+    iconPath: 'm9.75 9-3 3 3 3m4.5-6 3 3-3 3M14.25 4.5 9.75 19.5',
+  },
+  review: {
+    label: 'Review',
+    iconClass: 'is-slate',
+    iconPath: 'M7.5 6h9A2.25 2.25 0 0 1 18.75 8.25v5.25a2.25 2.25 0 0 1-2.25 2.25h-4.69l-3.54 2.66a.75.75 0 0 1-1.2-.6V15.75H7.5a2.25 2.25 0 0 1-2.25-2.25V8.25A2.25 2.25 0 0 1 7.5 6Zm1.5 3h6m-6 2.25h4.5',
+  },
+  finance: {
+    label: 'Finance',
+    iconClass: 'is-amber',
+    iconPath: 'M12 6v12m3-9.75h-4.125a1.875 1.875 0 1 0 0 3.75h2.25a1.875 1.875 0 1 1 0 3.75H9',
+  },
+}
+---
+
+<section class="section category-intro-band">
+  <div class="shell category-intro-shell">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Explore</p>
+        <h2>카테고리로 살펴보기</h2>
+        <p class="section-copy">
+          블로그에 쌓이는 기록을 성격별로 나누어, 필요한 내용을 더 빠르게 찾아볼 수 있습니다.
+        </p>
+      </div>
+    </div>
+
+    <div class="category-intro-grid">
+      {categories.map((category) => {
+        const visual = categoryVisuals[category.slug]
+
+        return (
+          <a class="category-intro-card" href={`/blog/category/${category.slug}/`}>
+            <div class="category-intro-top">
+              <div class={`category-intro-icon ${visual.iconClass}`}>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d={visual.iconPath}></path>
+                </svg>
+              </div>
+              <span class="category-intro-label">{visual.label}</span>
+              <h3>{category.title}</h3>
+              <strong>{category.description}</strong>
+            </div>
+          </a>
+        )
+      })}
+    </div>
+  </div>
+</section>
