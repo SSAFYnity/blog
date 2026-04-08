@@ -1,3 +1,9 @@
+// 블로그 자체의 공통 메타데이터입니다.
+// 브랜드/링크 값은 공식홈페이지를 기준으로 수동 동기화합니다.
+// 카테고리 정의와 카테고리별 표시 정보는 블로그가 원본입니다.
+// [업데이트 필요] 홈 URL, 공식 메일, SNS 링크 변경 시 메인 siteData.ts를 먼저 수정한 뒤 여기 반영하세요.
+// [주의] 이 값은 블로그 Header, Footer, 메타 정보에 함께 반영됩니다.
+// 함께 확인: /Users/hyeona/Dev/SSAFYnity/ssafynity.github.io/src/data/siteData.ts
 export const site = {
   name: 'SSAFYnity 블로그',
   shortName: 'SSAFYnity',
@@ -7,11 +13,31 @@ export const site = {
   baseUrl: 'https://ssafynity.github.io/blog',
   links: {
     home: 'https://ssafynity.github.io',
-    github: 'https://github.com/SSAFYnity',
-    instagram: 'https://www.instagram.com/ssafynity/',
-    linkedin: 'https://www.linkedin.com/company/ssafynity',
-    email: 'mailto:ssafynity@gmail.com',
+    privacy: 'https://ssafynity.github.io/privacy',
+    terms: 'https://ssafynity.github.io/terms',
   },
+  socialLinks: [
+    {
+      label: '문의하기',
+      href: 'mailto:ssafynity@gmail.com',
+      showInFooter: true,
+    },
+    {
+      label: 'Instagram',
+      href: 'https://www.instagram.com/ssafynity/',
+      showInFooter: true,
+    },
+    {
+      label: 'LinkedIn',
+      href: 'https://www.linkedin.com/company/ssafynity',
+      showInFooter: true,
+    },
+    {
+      label: 'GitHub',
+      href: 'https://github.com/SSAFYnity',
+      showInFooter: false,
+    },
+  ],
   categories: [
     {
       slug: 'notice',
@@ -21,22 +47,22 @@ export const site = {
     {
       slug: 'journal',
       title: '일지',
-      description: '동문회 활동과 운영 흐름을 남기는 기록',
+      description: '동문회가 운영한 행사의 하루를 전하는 기록',
     },
     {
       slug: 'tech',
       title: '기술',
-      description: '세미나, 개발 경험, 학습 인사이트를 다루는 글',
+      description: '운영 개발과 세미나 내용을 함께 나누는 기록',
     },
     {
       slug: 'review',
       title: '후기',
-      description: '참여자의 경험과 소감을 전하는 후기 글',
+      description: '실제 참가자들의 경험과 소감을 담은 후기',
     },
     {
       slug: 'finance',
       title: '회비',
-      description: '회비 집행 결과와 운영 내역을 공개하는 기록',
+      description: '동문회비 사용 내역을 투명하게 공개하는 기록',
     },
   ],
 } as const

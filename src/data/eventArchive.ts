@@ -1,3 +1,10 @@
+// 공식홈페이지 행사 데이터를 기준으로 수동 동기화하는 참조 테이블입니다.
+// 후기 글의 eventSlug 검증과 메인 사이트 상세 링크 연결에 사용합니다.
+// slug/title/kind 변경 시 공식홈페이지 수정 후 이 파일도 함께 반영합니다.
+// [업데이트 필요] 행사 slug/title/kind 변경 시 메인 행사 데이터를 먼저 수정한 뒤 이 파일을 함께 반영하세요.
+// [주의] 공개된 slug는 가능하면 변경하지 않습니다.
+// 함께 확인: /Users/hyeona/Dev/SSAFYnity/ssafynity.github.io/src/data/events/index.ts
+// 함께 확인: /Users/hyeona/Dev/SSAFYnity/ssafynity.github.io/src/data/events/
 export const eventArchive = [
   { slug: '2022-founding-ceremony', title: 'SSAFYnity 발대식', kind: 'special' },
   { slug: '2022-operator-mt', title: '1대 집행부 MT' },
