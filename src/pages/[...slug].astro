@@ -24,21 +24,23 @@ const dateLabel = new Intl.DateTimeFormat('ko-KR', {
 ---
 
 <BaseLayout title={`${post.data.title} | SSAFYnity 블로그`} description={post.data.description}>
-  <article class:list={['post-detail shell', post.data.category === 'journal' && 'is-journal']}>
-    <header class="post-detail-header">
-      <div class="post-meta-row">
-        <span class:list={['pill', categoryStyles[post.data.category] ?? 'is-slate']}>
-          {getCategoryTitle(post.data.category)}
-        </span>
-        <time datetime={post.data.pubDate.toISOString()}>{dateLabel}</time>
+  <section class="post-detail-shell">
+    <article class:list={['post-detail shell', post.data.category === 'journal' && 'is-journal']}>
+      <header class="post-detail-header">
+        <div class="post-meta-row">
+          <span class:list={['pill', categoryStyles[post.data.category] ?? 'is-slate']}>
+            {getCategoryTitle(post.data.category)}
+          </span>
+          <time datetime={post.data.pubDate.toISOString()}>{dateLabel}</time>
+        </div>
+
+        <h1>{post.data.title}</h1>
+        <p class="post-description">{post.data.description}</p>
+      </header>
+
+      <div class="prose">
+        <Content />
       </div>
-
-      <h1>{post.data.title}</h1>
-      <p class="post-description">{post.data.description}</p>
-    </header>
-
-    <div class="prose">
-      <Content />
-    </div>
-  </article>
+    </article>
+  </section>
 </BaseLayout>

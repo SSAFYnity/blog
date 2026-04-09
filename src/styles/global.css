@@ -689,6 +689,7 @@ p {
 
 .archive-section-band {
   border-top: 0;
+  padding-top: 18px;
 }
 
 .section-tight {
@@ -1064,17 +1065,22 @@ p {
   color: #64748b;
 }
 
+.post-detail-shell {
+  padding-top: calc(88px + var(--header-top-gap));
+  padding-bottom: 72px;
+}
+
 .post-detail {
   max-width: 860px;
-  margin-top: 56px;
-  margin-bottom: 72px;
+  margin-top: 0;
+  margin-bottom: 0;
   padding: 40px;
   border-radius: var(--radius-xl);
 }
 
 .archive-hero {
-  padding-top: 56px;
-  padding-bottom: 36px;
+  padding-top: calc(116px + var(--header-top-gap));
+  padding-bottom: 28px;
 }
 
 .archive-hero h1 {
@@ -1093,7 +1099,7 @@ p {
 }
 
 .archive-section {
-  padding-top: 28px;
+  padding-top: 18px;
 }
 
 .archive-toolbar {
@@ -1107,8 +1113,8 @@ p {
   flex-wrap: wrap;
   align-items: center;
   gap: 10px;
-  margin-bottom: 22px;
-  padding: 14px;
+  margin-bottom: 12px;
+  padding: 10px;
   border: 1px solid var(--line);
   border-radius: var(--radius-xl);
   background: rgba(255, 255, 255, 0.92);
@@ -1125,8 +1131,8 @@ p {
 
 .archive-search input {
   flex: 1;
-  min-height: 36px;
-  padding: 0 14px;
+  min-height: 34px;
+  padding: 0 12px;
   border: 1px solid #dbe3f2;
   border-radius: 999px;
   background: #ffffff;
@@ -1147,8 +1153,8 @@ p {
 
 .archive-search-button,
 .archive-pill-button {
-  min-height: 36px;
-  padding: 0 14px;
+  min-height: 34px;
+  padding: 0 13px;
   border-radius: 999px;
   border: 1px solid #e2e8f0;
   background: #ffffff;
@@ -2010,6 +2016,11 @@ p {
     padding: 22px;
   }
 
+  .post-detail-shell {
+    padding-top: calc(76px + var(--header-top-gap));
+    padding-bottom: 56px;
+  }
+
   .notice-row,
   .activity-card,
   .finance-card,
@@ -2043,6 +2054,10 @@ p {
     padding: 80px 0;
   }
 
+  .archive-section-band {
+    padding-top: 18px;
+  }
+
   .shell {
     padding-left: 24px;
     padding-right: 24px;
@@ -2060,6 +2075,10 @@ p {
 @media (min-width: 1024px) {
   .section {
     padding: 112px 0;
+  }
+
+  .archive-section-band {
+    padding-top: 18px;
   }
 
   .shell {
@@ -2239,7 +2258,7 @@ p {
 /* Totally new home */
 .redesign-hero {
   min-height: 68vh;
-  padding-top: 56px;
+  padding-top: calc(116px + var(--header-top-gap));
   padding-bottom: 48px;
   display: flex;
   align-items: center;
@@ -2697,8 +2716,12 @@ p {
 @media (max-width: 900px) {
   .redesign-hero {
     min-height: auto;
-    padding-top: 44px;
+    padding-top: calc(96px + var(--header-top-gap));
     padding-bottom: 28px;
+  }
+
+  .archive-hero {
+    padding-top: calc(96px + var(--header-top-gap));
   }
 
   .category-intro-grid,
@@ -2757,7 +2780,7 @@ p {
 
   .redesign-hero {
     min-height: auto;
-    padding-top: 28px;
+    padding-top: calc(96px + var(--header-top-gap));
     padding-bottom: 24px;
   }
 
