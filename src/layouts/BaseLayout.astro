@@ -7,12 +7,20 @@ import { site } from '../data/site'
 interface Props {
   title?: string
   description?: string
+  analyticsEvent?: {
+    name: string
+    params?: Record<string, string>
+  }
 }
 
 const {
   title = site.title,
   description = site.description,
+  analyticsEvent,
 } = Astro.props
+
+const GA_MEASUREMENT_ID = 'G-2W9HFYG765'
+const isAnalyticsEnabled = import.meta.env.PROD && GA_MEASUREMENT_ID.length > 0
 ---
 
 <!doctype html>
@@ -26,6 +34,23 @@ const {
     <link rel="icon" type="image/svg+xml" href="/blog/logo-icon.svg" />
     <link rel="apple-touch-icon" href="/blog/logo-icon.svg" />
     <title>{title}</title>
+    {isAnalyticsEnabled && (
+      <>
+        <script
+          async
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+        ></script>
+        <script is:inline>
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            window.gtag = window.gtag || gtag;
+            gtag('js', new Date());
+            gtag('config', '${GA_MEASUREMENT_ID}');
+          `}
+        </script>
+      </>
+    )}
   </head>
   <body>
     <div class="page-bg" aria-hidden="true"></div>
@@ -34,5 +59,47 @@ const {
       <slot />
     </main>
     <SiteFooter />
+    {isAnalyticsEnabled && analyticsEvent && (
+      <script is:inline>
+        {`
+          window.gtag && window.gtag('event', ${JSON.stringify(analyticsEvent.name)}, ${JSON.stringify({
+            page_path: Astro.url.pathname,
+            page_title: title,
+            ...analyticsEvent.params,
+          })});
+        `}
+      </script>
+    )}
+    {isAnalyticsEnabled && (
+      <script is:inline>
+        {`
+          document.addEventListener('click', (event) => {
+            const target = event.target;
+            if (!(target instanceof Element)) return;
+
+            const anchor = target.closest('a[data-analytics-event]');
+            if (!(anchor instanceof HTMLAnchorElement)) return;
+            if (!window.gtag) return;
+
+            const rawPayload = anchor.dataset.analyticsPayload;
+            let payload = {};
+
+            if (rawPayload) {
+              try {
+                payload = JSON.parse(rawPayload);
+              } catch {
+                payload = {};
+              }
+            }
+
+            window.gtag('event', anchor.dataset.analyticsEvent, {
+              page_path: window.location.pathname,
+              page_title: document.title,
+              ...payload,
+            });
+          });
+        `}
+      </script>
+    )}
   </body>
 </html>
