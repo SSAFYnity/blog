@@ -1,5 +1,5 @@
 ---
-import { site } from '../data/site'
+import { getOfficialUrl, site } from '../data/site'
 
 const footerSocialLinks = site.socialLinks.filter((link) => link.showInFooter)
 
@@ -47,8 +47,8 @@ const socialIcons: Record<string, { viewBox: string; body: string }> = {
 
     <div class="shell footer-mobile-meta">
       <div class="footer-mobile-legal">
-        <a href={site.links.privacy}>개인정보처리방침</a>
-        <a href={site.links.terms}>이용약관</a>
+        <a href={getOfficialUrl(site.links.policyPaths.privacy)}>개인정보처리방침</a>
+        <a href={getOfficialUrl(site.links.policyPaths.terms)}>이용약관</a>
       </div>
       <p>© {new Date().getFullYear()} SSAFYnity</p>
     </div>
@@ -92,8 +92,8 @@ const socialIcons: Record<string, { viewBox: string; body: string }> = {
     <div class="shell footer-meta">
       <p>© {new Date().getFullYear()} SSAFYnity. All rights reserved.</p>
       <div class="footer-legal">
-        <a href={site.links.privacy}>개인정보처리방침</a>
-        <a href={site.links.terms}>이용약관</a>
+        <a href={getOfficialUrl(site.links.policyPaths.privacy)}>개인정보처리방침</a>
+        <a href={getOfficialUrl(site.links.policyPaths.terms)}>이용약관</a>
       </div>
     </div>
   </div>
