@@ -13,8 +13,10 @@ export const site = {
   baseUrl: 'https://ssafynity.github.io/blog',
   links: {
     home: 'https://ssafynity.github.io',
-    privacy: 'https://ssafynity.github.io/privacy',
-    terms: 'https://ssafynity.github.io/terms',
+    policyPaths: {
+      privacy: '/privacy',
+      terms: '/terms',
+    },
   },
   socialLinks: [
     {
@@ -76,6 +78,8 @@ export const site = {
     },
   ],
 } as const
+
+export const getOfficialUrl = (path: string) => `${site.links.home}${path}`
 
 export type Category = (typeof site.categories)[number]
 export type CategorySlug = Category['slug']
