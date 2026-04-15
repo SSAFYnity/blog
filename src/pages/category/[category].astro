@@ -5,7 +5,7 @@ import PostCard from '../../components/PostCard.astro'
 import { archiveEmptyMessages, archiveFilterLabels, archiveYearOptions, reviewAudienceLabels } from '../../data/archive'
 import { categoryMap, categoryStyles, getCategoryTitle, site } from '../../data/site'
 import { eventArchiveMap, eventKindLabels, getEventArchiveUrl } from '../../data/eventArchive'
-import { buildArchiveSearchText, formatArchiveDate, formatReviewAuthor } from '../../lib/archive'
+import { buildArchiveSearchText, formatArchiveDate, formatReviewAuthor, getPostEventSlug, getReviewAuthorDisplayName } from '../../lib/archive'
 import { isPublicPost } from '../../lib/content'
 
 export async function getStaticPaths() {
@@ -159,7 +159,7 @@ const reviewColumns =
             data-filter-item
             data-date={post.data.pubDate.toISOString()}
             data-year={String(post.data.pubDate.getFullYear())}
-            data-event=""
+            data-event={getPostEventSlug(post) ?? ''}
             data-tags={post.data.tags.join('|')}
             data-search={buildArchiveSearchText(post)}
           >
@@ -177,31 +177,29 @@ const reviewColumns =
     {posts.length > 0 && category.slug === 'journal' && (
       <div class="activity-log" data-filter-list>
         {posts.map((post) => (
-          <article
-            class="activity-entry"
+          <a
+            class="activity-card activity-card-journal"
+            href={`/blog/${post.slug}/`}
             data-filter-item
             data-date={post.data.pubDate.toISOString()}
             data-year={String(post.data.pubDate.getFullYear())}
-            data-event=""
+            data-event={getPostEventSlug(post) ?? ''}
             data-tags={post.data.tags.join('|')}
             data-search={buildArchiveSearchText(post)}
           >
-            <div class="activity-stamp">
-              <span>{formatArchiveDate(post.data.pubDate)}</span>
+            <div class="activity-card-meta">
+              <time datetime={post.data.pubDate.toISOString()}>{formatArchiveDate(post.data.pubDate)}</time>
             </div>
-            <a class="activity-card" href={`/blog/${post.slug}/`}>
-              <span class={`pill ${categoryStyles[post.data.category]}`}>{getCategoryTitle(post.data.category)}</span>
-              <h2>{post.data.title}</h2>
-              <p>{post.data.description}</p>
-              {post.data.tags.length > 0 && (
-                <ul class="tag-list" aria-label="태그">
-                  {post.data.tags.map((tag) => (
-                    <li>#{tag}</li>
-                  ))}
-                </ul>
-              )}
-            </a>
-          </article>
+            <h2>{post.data.title}</h2>
+            <p>{post.data.description}</p>
+            {post.data.tags.length > 0 && (
+              <ul class="tag-list" aria-label="태그">
+                {post.data.tags.map((tag) => (
+                  <li>#{tag}</li>
+                ))}
+              </ul>
+            )}
+          </a>
         ))}
       </div>
     )}
@@ -213,7 +211,7 @@ const reviewColumns =
             data-filter-item
             data-date={post.data.pubDate.toISOString()}
             data-year={String(post.data.pubDate.getFullYear())}
-            data-event=""
+            data-event={getPostEventSlug(post) ?? ''}
             data-tags={post.data.tags.join('|')}
             data-search={buildArchiveSearchText(post)}
           >
@@ -241,8 +239,8 @@ const reviewColumns =
                 data-filter-item
                 data-date={post.data.pubDate.toISOString()}
                 data-year={String(post.data.pubDate.getFullYear())}
-                data-event={post.data.review?.eventSlug ?? ''}
-                data-kind={post.data.review?.eventSlug ? eventArchiveMap[post.data.review.eventSlug]?.kind ?? '' : ''}
+                data-event={getPostEventSlug(post) ?? ''}
+                data-kind={getPostEventSlug(post) ? eventArchiveMap[getPostEventSlug(post)]?.kind ?? '' : ''}
                 data-audience={post.data.review?.authorType ?? ''}
                 data-tags={post.data.tags.join('|')}
                 data-search={buildArchiveSearchText(post)}
@@ -253,14 +251,14 @@ const reviewColumns =
                   data-review-entry
                 >
                   <div class="review-entry-meta">
-                    {post.data.review?.eventSlug && (
+                    {getPostEventSlug(post) && (
                       <a
                         class="review-event-link"
-                        href={getEventArchiveUrl(post.data.review.eventSlug)}
+                        href={getEventArchiveUrl(getPostEventSlug(post)!)}
                         target="_blank"
                         rel="noreferrer"
                       >
-                        {eventArchiveMap[post.data.review.eventSlug].title}
+                        {eventArchiveMap[getPostEventSlug(post)!].title}
                       </a>
                     )}
 
@@ -304,8 +302,8 @@ const reviewColumns =
                           href={post.data.review.link}
                           target="_blank"
                           rel="noreferrer"
-                          aria-label={`${post.data.review.name} 링크 열기`}
-                          title={`${post.data.review.name} 링크 열기`}
+                          aria-label={`${getReviewAuthorDisplayName(post.data.review) ?? post.data.review.name} 링크 열기`}
+                          title={`${getReviewAuthorDisplayName(post.data.review) ?? post.data.review.name} 링크 열기`}
                         >
                           <svg viewBox="0 0 24 24" aria-hidden="true">
                             <path
@@ -337,7 +335,7 @@ const reviewColumns =
             data-filter-item
             data-date={post.data.pubDate.toISOString()}
             data-year={String(post.data.pubDate.getFullYear())}
-            data-event=""
+            data-event={getPostEventSlug(post) ?? ''}
             data-tags={post.data.tags.join('|')}
             data-search={buildArchiveSearchText(post)}
           >
@@ -391,9 +389,12 @@ const reviewColumns =
   ) {
     const items = [...filterList.querySelectorAll('[data-filter-item]')]
     const reviewColumns = [...filterList.querySelectorAll('[data-review-column]')]
+    const params = new URLSearchParams(window.location.search)
+    const initialEvent = params.get('event')?.trim() ?? ''
     let activeQuery = ''
     let activeKind = ''
     let activeAudience = ''
+    let activeEvent = initialEvent
     let activeYear = ''
     let activeSort = 'newest'
 
@@ -442,12 +443,14 @@ const reviewColumns =
         const haystack = (item.getAttribute('data-search') ?? '').toLowerCase()
         const kindValue = item.getAttribute('data-kind') ?? ''
         const audienceValue = item.getAttribute('data-audience') ?? ''
+        const eventValue = item.getAttribute('data-event') ?? ''
         const yearValue = item.getAttribute('data-year') ?? ''
         const matchesQuery = !activeQuery || haystack.includes(activeQuery)
         const matchesKind = !activeKind || kindValue === activeKind
         const matchesAudience = !activeAudience || audienceValue === activeAudience
+        const matchesEvent = !activeEvent || eventValue === activeEvent
         const matchesYear = !activeYear || yearValue === activeYear
-        const visible = matchesQuery && matchesKind && matchesAudience && matchesYear
+        const visible = matchesQuery && matchesKind && matchesAudience && matchesEvent && matchesYear
         item.toggleAttribute('hidden', !visible)
       })
 
@@ -458,7 +461,7 @@ const reviewColumns =
         emptyState.hidden = visibleCount > 0
       }
 
-      resetButton.hidden = !(activeQuery || activeKind || activeAudience || activeYear || activeSort !== 'newest')
+      resetButton.hidden = !(activeQuery || activeKind || activeAudience || activeEvent || activeYear || activeSort !== 'newest')
     }
 
     const closeDropdowns = () => {
@@ -548,6 +551,7 @@ const reviewColumns =
       activeQuery = ''
       activeKind = ''
       activeAudience = ''
+      activeEvent = ''
       activeYear = ''
       activeSort = 'newest'
       searchInput.value = ''
@@ -559,6 +563,7 @@ const reviewColumns =
       audienceOptions.forEach((option) => option.classList.toggle('is-selected', (option.dataset.value ?? '') === ''))
       yearOptions.forEach((option) => option.classList.toggle('is-selected', (option.dataset.value ?? '') === ''))
       sortOptions.forEach((option) => option.classList.toggle('is-selected', option.dataset.value === 'newest'))
+      window.history.replaceState({}, '', window.location.pathname)
       applyFilters()
     })
 

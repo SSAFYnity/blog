@@ -2,6 +2,9 @@
 import { getCollection, render } from 'astro:content'
 import BaseLayout from '../layouts/BaseLayout.astro'
 import { categoryStyles, getCategoryTitle } from '../data/site'
+import { eventArchiveMap, getEventArchiveUrl } from '../data/eventArchive'
+import { publicOperatorProfileMap } from '../data/operatorProfiles'
+import { getPostEventSlug } from '../lib/archive'
 import { isPublicPost } from '../lib/content'
 
 export async function getStaticPaths() {
@@ -15,32 +18,156 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props
 const { Content } = await render(post)
+const eventSlug = getPostEventSlug(post)
+const eventArchiveLink = eventSlug ? getEventArchiveUrl(eventSlug) : null
+const eventArchiveTitle = eventSlug ? eventArchiveMap[eventSlug].title : null
+const eventArchiveDateLabel = eventSlug ? eventArchiveMap[eventSlug].eventDateLabel : null
+const authorProfile = post.data.author?.operatorId ? publicOperatorProfileMap[post.data.author.operatorId] : null
 
 const dateLabel = new Intl.DateTimeFormat('ko-KR', {
   year: 'numeric',
   month: 'long',
   day: 'numeric',
 }).format(post.data.pubDate)
+
+const authorLabel = authorProfile
+  ? authorProfile.anonymous
+    ? '익명 운영진'
+    : [authorProfile.name, authorProfile.campus, authorProfile.cohort != null ? `${authorProfile.cohort}기` : null]
+        .filter(Boolean)
+        .join(' · ')
+  : null
 ---
 
 <BaseLayout title={`${post.data.title} | SSAFYnity 블로그`} description={post.data.description}>
   <section class="post-detail-shell">
-    <article class:list={['post-detail shell', post.data.category === 'journal' && 'is-journal']}>
-      <header class="post-detail-header">
-        <div class="post-meta-row">
-          <span class:list={['pill', categoryStyles[post.data.category] ?? 'is-slate']}>
-            {getCategoryTitle(post.data.category)}
-          </span>
-          <time datetime={post.data.pubDate.toISOString()}>{dateLabel}</time>
-        </div>
+    <div class:list={['post-detail-frame shell', (eventArchiveLink || authorProfile) && 'has-aside']}>
+      <header class:list={['post-detail-header', post.data.category === 'journal' && 'is-journal']}>
+        <div class="post-detail-header-copy">
+          <div class="post-meta-row">
+            {post.data.category !== 'journal' && (
+              <span class:list={['pill', categoryStyles[post.data.category] ?? 'is-slate']}>
+                {getCategoryTitle(post.data.category)}
+              </span>
+            )}
+            {post.data.category !== 'journal' && (
+              <time datetime={post.data.pubDate.toISOString()}>{dateLabel}</time>
+            )}
+          </div>
 
-        <h1>{post.data.title}</h1>
-        <p class="post-description">{post.data.description}</p>
+          <h1>{post.data.title}</h1>
+          <p class="post-description">{post.data.description}</p>
+        </div>
       </header>
 
-      <div class="prose">
-        <Content />
+      <div class:list={['post-detail-main', (eventArchiveLink || authorProfile) && 'has-aside', post.data.category === 'journal' && 'is-journal']}>
+        <article class="post-detail">
+          <div class="prose">
+            <Content />
+          </div>
+        </article>
+
+        {(eventArchiveLink || authorProfile) && (
+          <aside class="post-detail-aside">
+            <section class="post-aside-card">
+              {eventArchiveLink && eventArchiveTitle && (
+                <div class="post-aside-section">
+                  <div class="post-aside-kicker">
+                    <span class="post-aside-kicker-mark" aria-hidden="true"></span>
+                    <strong>관련 행사</strong>
+                  </div>
+                  <a
+                    class="post-aside-event-link"
+                    href={eventArchiveLink}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <span class="post-aside-event-title">{eventArchiveTitle}</span>
+                    <span class="post-aside-event-arrow" aria-hidden="true"></span>
+                  </a>
+                  <div class="post-aside-meta">
+                    <div class="post-aside-meta-row">
+                      <span>작성일</span>
+                      <b>{dateLabel}</b>
+                    </div>
+                    {eventArchiveDateLabel && (
+                      <div class="post-aside-meta-row">
+                        <span>행사일시</span>
+                        <b>{eventArchiveDateLabel}</b>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {eventArchiveLink && eventArchiveTitle && authorProfile && (
+                <div class="post-aside-divider" aria-hidden="true"></div>
+              )}
+
+              {authorProfile && (
+                <div class="post-aside-section">
+                  <div class="post-aside-kicker">
+                    <span class="post-aside-kicker-mark" aria-hidden="true"></span>
+                    <strong>작성 운영진</strong>
+                  </div>
+                  {!authorProfile.anonymous ? (
+                    <div class="post-aside-operator-inline">
+                      <span class="post-aside-operator-name">{authorProfile.name}</span>
+                      {authorProfile.cohort != null && (
+                        <span class="post-aside-operator-inline-meta">{authorProfile.cohort}기</span>
+                      )}
+                      {authorProfile.campus && (
+                        <span class="post-aside-operator-inline-meta">{authorProfile.campus}</span>
+                      )}
+                      {authorProfile.url && (
+                        <a
+                          class="post-aside-operator-link"
+                          href={authorProfile.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          aria-label={`${authorProfile.name} 프로필 보기`}
+                        >
+                          <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path
+                              d="M15 3h6v6"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="1.8"
+                            />
+                            <path
+                              d="M10 14 21 3"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="1.8"
+                            />
+                            <path
+                              d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="1.8"
+                            />
+                          </svg>
+                        </a>
+                      )}
+                    </div>
+                  ) : (
+                    <p class="post-aside-operator-name">{authorProfile.name}</p>
+                  )}
+                  {authorProfile.anonymous && (
+                    <p class="post-aside-operator-note">공개 정책에 따라 익명으로 표시됩니다</p>
+                  )}
+                </div>
+              )}
+            </section>
+          </aside>
+        )}
       </div>
-    </article>
+    </div>
   </section>
 </BaseLayout>
