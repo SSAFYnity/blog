@@ -23,6 +23,7 @@ const eventArchiveLink = eventSlug ? getEventArchiveUrl(eventSlug) : null
 const eventArchiveTitle = eventSlug ? eventArchiveMap[eventSlug].title : null
 const eventArchiveDateLabel = eventSlug ? eventArchiveMap[eventSlug].eventDateLabel : null
 const authorProfile = post.data.author?.operatorId ? publicOperatorProfileMap[post.data.author.operatorId] : null
+const hasAside = post.data.category === 'journal' && (eventArchiveLink || authorProfile)
 
 const dateLabel = new Intl.DateTimeFormat('ko-KR', {
   year: 'numeric',
@@ -30,18 +31,34 @@ const dateLabel = new Intl.DateTimeFormat('ko-KR', {
   day: 'numeric',
 }).format(post.data.pubDate)
 
-const authorLabel = authorProfile
-  ? authorProfile.anonymous
-    ? '익명 운영진'
-    : [authorProfile.name, authorProfile.campus, authorProfile.cohort != null ? `${authorProfile.cohort}기` : null]
+const seriesMetaLabel =
+  post.data.category === 'series'
+    ? [
+        post.data.seriesMeta?.season,
+        post.data.seriesMeta?.team,
+        post.data.seriesMeta?.label,
+        post.data.seriesMeta?.issueLabel,
+      ]
         .filter(Boolean)
         .join(' · ')
-  : null
+    : null
 ---
 
-<BaseLayout title={`${post.data.title} | SSAFYnity 블로그`} description={post.data.description}>
+<BaseLayout
+  title={`${post.data.title} | SSAFYnity 블로그`}
+  description={post.data.description}
+  analyticsEvent={{
+    name: 'view_blog_post',
+    params: {
+      post_slug: post.slug,
+      post_title: post.data.title,
+      post_category: post.data.category,
+      post_publish_date: post.data.pubDate.toISOString().slice(0, 10),
+    },
+  }}
+>
   <section class="post-detail-shell">
-    <div class:list={['post-detail-frame shell', (eventArchiveLink || authorProfile) && 'has-aside']}>
+    <div class:list={['post-detail-frame shell', hasAside && 'has-aside']}>
       <header class:list={['post-detail-header', post.data.category === 'journal' && 'is-journal']}>
         <div class="post-detail-header-copy">
           <div class="post-meta-row">
@@ -56,18 +73,19 @@ const authorLabel = authorProfile
           </div>
 
           <h1>{post.data.title}</h1>
+          {seriesMetaLabel && <p class="post-series-meta">{seriesMetaLabel}</p>}
           <p class="post-description">{post.data.description}</p>
         </div>
       </header>
 
-      <div class:list={['post-detail-main', (eventArchiveLink || authorProfile) && 'has-aside', post.data.category === 'journal' && 'is-journal']}>
+      <div class:list={['post-detail-main', hasAside && 'has-aside', post.data.category === 'journal' && 'is-journal']}>
         <article class="post-detail">
           <div class="prose">
             <Content />
           </div>
         </article>
 
-        {(eventArchiveLink || authorProfile) && (
+        {hasAside && (
           <aside class="post-detail-aside">
             <section class="post-aside-card">
               {eventArchiveLink && eventArchiveTitle && (
