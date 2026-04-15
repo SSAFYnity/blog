@@ -7,7 +7,8 @@ const posts = defineCollection({
       title: z.string(),
       description: z.string(),
       pubDate: z.coerce.date(),
-      category: z.enum(['tech', 'journal', 'review', 'notice', 'finance']),
+      category: z.enum(['series', 'tech', 'journal', 'review', 'notice', 'finance']),
+      coverImage: z.string().optional(),
       eventSlug: z.enum(eventArchiveSlugs).optional(),
       author: z
         .object({
@@ -16,6 +17,14 @@ const posts = defineCollection({
         .optional(),
       draft: z.boolean().default(false),
       tags: z.array(z.string()).default([]),
+      seriesMeta: z
+        .object({
+          season: z.string().optional(),
+          team: z.string().optional(),
+          label: z.string().optional(),
+          issueLabel: z.string().optional(),
+        })
+        .optional(),
       review: z
         .object({
           authorType: z.enum(['member', 'guest']),
@@ -43,6 +52,48 @@ const posts = defineCollection({
           path: ['review', 'operatorId'],
           message: '운영진 review 글에는 review.operatorId가 필요합니다.',
         })
+      }
+
+      if (value.category === 'series') {
+        if (!value.coverImage) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['coverImage'],
+            message: 'series 글에는 coverImage가 필요합니다.',
+          })
+        }
+
+        if (!value.seriesMeta?.season) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['seriesMeta', 'season'],
+            message: 'series 글에는 seriesMeta.season이 필요합니다.',
+          })
+        }
+
+        if (!value.seriesMeta?.team) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['seriesMeta', 'team'],
+            message: 'series 글에는 seriesMeta.team이 필요합니다.',
+          })
+        }
+
+        if (!value.seriesMeta?.label) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['seriesMeta', 'label'],
+            message: 'series 글에는 seriesMeta.label이 필요합니다.',
+          })
+        }
+
+        if (!value.seriesMeta?.issueLabel) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['seriesMeta', 'issueLabel'],
+            message: 'series 글에는 seriesMeta.issueLabel이 필요합니다.',
+          })
+        }
       }
     }),
 })

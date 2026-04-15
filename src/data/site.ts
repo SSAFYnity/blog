@@ -8,7 +8,7 @@ export const site = {
   name: 'SSAFYnity 블로그',
   shortName: 'SSAFYnity',
   title: 'SSAFYnity 블로그',
-  description: '공지, 일지, 기술, 후기, 회비 기록을 담는 SSAFYnity 공식 블로그',
+  description: '공지, 일지, 연재, 기술, 후기, 회비 기록을 담는 SSAFYnity 공식 블로그',
   slogan: '싸피 수료생들이 직접 운영하는 동문회의 공식 블로그',
   baseUrl: 'https://ssafynity.github.io/blog',
   links: {
@@ -62,9 +62,14 @@ export const site = {
       description: '동문회가 운영한 행사의 하루를 전하는 기록',
     },
     {
+      slug: 'series',
+      title: '연재',
+      description: '동문회 안에서 이어지는 시리즈형 콘텐츠와 기획 연재',
+    },
+    {
       slug: 'tech',
       title: '기술',
-      description: '운영 개발과 세미나 내용을 함께 나누는 기록',
+      description: '운영 개발과 세미나 내용을 함께 나누는 기술 기록',
     },
     {
       slug: 'review',
@@ -89,6 +94,7 @@ export const categoryMap = Object.fromEntries(
 ) as Record<CategorySlug, Category>
 
 export const categoryStyles: Record<CategorySlug, string> = {
+  series: 'is-emerald',
   tech: 'is-blue',
   journal: 'is-sky',
   review: 'is-slate',
