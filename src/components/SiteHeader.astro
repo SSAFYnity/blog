@@ -6,10 +6,6 @@ const normalizedPath = currentPath.endsWith('/') ? currentPath : `${currentPath}
 const isHomePath = normalizedPath === '/blog/' || normalizedPath === '/'
 
 const navItems = [
-  {
-    label: '전체 글',
-    href: '/blog/posts/',
-  },
   ...site.categories.map((category) => ({
     label: category.title,
     href: `/blog/category/${category.slug}/`,
