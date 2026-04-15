@@ -3,29 +3,56 @@ import { categoryStyles, type CategorySlug, getCategoryTitle } from '../data/sit
 
 interface Props {
   href: string
+  slug?: string
   title: string
   description: string
   pubDate: Date
   category: CategorySlug
+  coverImage?: string
   tags?: string[]
 }
 
-const { href, title, description, pubDate, category, tags = [] } = Astro.props
+const { href, slug, title, description, pubDate, category, coverImage, tags = [] } = Astro.props
 
 const dateLabel = new Intl.DateTimeFormat('ko-KR', {
   year: 'numeric',
   month: 'long',
   day: 'numeric',
 }).format(pubDate)
+
+const analyticsPayload = JSON.stringify({
+  post_slug: slug,
+  post_title: title,
+  post_category: category,
+  destination_url: href,
+  source_area: 'post_card',
+})
 ---
 
 <article class="post-card">
+  {coverImage && (
+    <a
+      class="post-card-cover"
+      href={href}
+      aria-label={`${title} 대표 이미지`}
+      data-analytics-event="select_blog_post"
+      data-analytics-payload={analyticsPayload}
+    >
+      <img src={coverImage} alt="" loading="lazy" />
+    </a>
+  )}
+
   <div class="post-meta-row">
     <span class:list={['pill', categoryStyles[category] ?? 'is-slate']}>{getCategoryTitle(category)}</span>
     <time datetime={pubDate.toISOString()}>{dateLabel}</time>
   </div>
 
-  <a class="post-card-link" href={href}>
+  <a
+    class="post-card-link"
+    href={href}
+    data-analytics-event="select_blog_post"
+    data-analytics-payload={analyticsPayload}
+  >
     <h3>{title}</h3>
     <p>{description}</p>
   </a>

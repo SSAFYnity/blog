@@ -156,6 +156,14 @@ const reviewColumns =
           <a
             class="notice-row"
             href={`/blog/${post.slug}/`}
+            data-analytics-event="select_blog_post"
+            data-analytics-payload={JSON.stringify({
+              post_slug: post.slug,
+              post_title: post.data.title,
+              post_category: post.data.category,
+              destination_url: `/blog/${post.slug}/`,
+              source_area: 'category_notice',
+            })}
             data-filter-item
             data-date={post.data.pubDate.toISOString()}
             data-year={String(post.data.pubDate.getFullYear())}
@@ -180,6 +188,14 @@ const reviewColumns =
           <a
             class="activity-card activity-card-journal"
             href={`/blog/${post.slug}/`}
+            data-analytics-event="select_blog_post"
+            data-analytics-payload={JSON.stringify({
+              post_slug: post.slug,
+              post_title: post.data.title,
+              post_category: post.data.category,
+              destination_url: `/blog/${post.slug}/`,
+              source_area: 'category_journal',
+            })}
             data-filter-item
             data-date={post.data.pubDate.toISOString()}
             data-year={String(post.data.pubDate.getFullYear())}
@@ -204,7 +220,7 @@ const reviewColumns =
       </div>
     )}
 
-    {posts.length > 0 && category.slug === 'tech' && (
+    {posts.length > 0 && (category.slug === 'series' || category.slug === 'tech') && (
       <div class="post-grid" data-filter-list>
         {posts.map((post) => (
           <div
@@ -217,10 +233,12 @@ const reviewColumns =
           >
             <PostCard
               href={`/blog/${post.slug}/`}
+              slug={post.slug}
               title={post.data.title}
               description={post.data.description}
               pubDate={post.data.pubDate}
               category={post.data.category}
+              coverImage={post.data.coverImage}
               tags={post.data.tags}
             />
           </div>
@@ -343,7 +361,17 @@ const reviewColumns =
               <span class={`pill ${categoryStyles[post.data.category]}`}>{getCategoryTitle(post.data.category)}</span>
               <time datetime={post.data.pubDate.toISOString()}>{formatArchiveDate(post.data.pubDate)}</time>
             </div>
-            <a href={`/blog/${post.slug}/`}>
+            <a
+              href={`/blog/${post.slug}/`}
+              data-analytics-event="select_blog_post"
+              data-analytics-payload={JSON.stringify({
+                post_slug: post.slug,
+                post_title: post.data.title,
+                post_category: post.data.category,
+                destination_url: `/blog/${post.slug}/`,
+                source_area: 'category_finance',
+              })}
+            >
               <h2>{post.data.title}</h2>
               <p>{post.data.description}</p>
             </a>

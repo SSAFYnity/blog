@@ -17,16 +17,26 @@ const { posts } = Astro.props
         <p class="eyebrow">Latest</p>
         <h2>최근 올라온 글</h2>
         <p class="section-copy">
-          공지와 기록, 기술 공유 가운데 가장 먼저 공개된 글부터 차분하게 살펴볼 수 있습니다.
+          공지와 기록, 연재, 기술 콘텐츠 가운데 가장 먼저 공개된 글부터 차분하게 살펴볼 수 있습니다.
         </p>
       </div>
-      <a class="section-link" href="/blog/posts/">전체 글 보기</a>
     </div>
 
     {posts.length > 0 ? (
       <div class="redesign-latest-layout">
         {posts.map((post) => (
-          <a class="redesign-latest-item" href={`/blog/${post.slug}/`}>
+          <a
+            class="redesign-latest-item"
+            href={`/blog/${post.slug}/`}
+            data-analytics-event="select_blog_post"
+            data-analytics-payload={JSON.stringify({
+              post_slug: post.slug,
+              post_title: post.data.title,
+              post_category: post.data.category,
+              destination_url: `/blog/${post.slug}/`,
+              source_area: 'home_latest',
+            })}
+          >
             <div class="redesign-latest-copy">
               <div class="redesign-latest-item-meta">
                 <span class={`pill ${categoryStyles[post.data.category]}`}>
@@ -50,7 +60,7 @@ const { posts } = Astro.props
     ) : (
       <div class="archive-empty-state home-empty-state">
         <strong>최근 공개된 글이 아직 없습니다.</strong>
-        <p>첫 번째 공지, 기술, 회비 기록이 올라오면 이곳에서 바로 확인할 수 있습니다.</p>
+        <p>첫 번째 공지, 연재, 기술, 회비 기록이 올라오면 이곳에서 바로 확인할 수 있습니다.</p>
       </div>
     )}
   </div>
