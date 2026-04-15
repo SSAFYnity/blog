@@ -1,24 +1,20 @@
 ---
-title: "SSAFYnity 집행부 봄 MT 돌아보기"
+title: "봄 MT로 더 가까워진 2대 집행부"
 description: ""
 pubDate: 2023-04-09
 category: journal
+author:
+  operatorId: operator-032
+eventSlug: 2023-operator-spring-mt
 tags:
-  - 행사
   - MT
   - 집행부
   - "2023"
 ---
 
-안녕하세요. SSAFYnity 여러분!
+지난 3월 25일과 26일, 2대 집행부는 봄 MT를 다녀왔습니다.
 
-2대 집행부 진행소통국 공윤환입니다.
-
-지난 3월 25일-26일 이틀간 저희 집행부는 봄 MT를 갔다 왔는데요!
-
-여러분께 간접 MT를 선사하려 합니다.
-
-(네. 뒷북 후일담 맞아요... 😞)
+그날의 분위기를 기록으로 전해드립니다.
 
 ![봄 MT 첫 모임](/blog/journal/2023-spring-executive-mt/01.jpeg)
 

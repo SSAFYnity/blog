@@ -1,18 +1,18 @@
 ---
-title: "SSAFYnity 가을 운동회"
+title: "치열하고 유쾌했던 첫 가을 운동회"
 description: ""
 pubDate: 2022-10-24
 category: journal
+author:
+  operatorId: operator-005
+eventSlug: 2022-sports-day
 tags:
-  - 행사
   - 운동회
   - 가을
   - "2022"
 ---
 
 ![가을 운동회 포스터](/blog/journal/2022-fall-sports-day/01.png)
-
-안녕하세요, SSAFYnity입니다.
 
 지난 10월 22일, SSAFYnity의 첫 가을 운동회가 열렸습니다.
 

@@ -1,15 +1,15 @@
 ---
-title: "[SSAFYnity] 싸피인의 밤 (24.02.17)"
+title: "만남과 추억이 가득했던 2024 싸피인의 밤"
 description: ""
 pubDate: 2024-02-26
 category: journal
+author:
+  operatorId: operator-053
+eventSlug: 2024-night-of-ssafynity
 tags:
-  - 행사
   - 싸피인의밤
   - "2024"
 ---
-
-안녕하십니까 싸피니티 컨텐츠팀 김지헌입니다
 
 지난 2024년 2월 17일 토요일에 합정역 근처 합정티라미슈에서 2024년 싸피인의 밤 행사가 진행되었습니다
 

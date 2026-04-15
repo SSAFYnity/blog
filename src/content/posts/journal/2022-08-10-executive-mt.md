@@ -1,22 +1,18 @@
 ---
-title: "SSAFYnity 집행부 MT"
+title: "집행부가 한층 가까워진 여름 MT"
 description: ""
 pubDate: 2022-08-10
 category: journal
+author:
+  operatorId: operator-005
+eventSlug: 2022-operator-mt
 tags:
-  - 행사
   - MT
   - 집행부
   - "2022"
 ---
 
 ![집행부 MT 썸네일](/blog/journal/2022-executive-mt/01.png)
-
-안녕하세요,
-
-싸피 동문회 여러분!
-
-홍보국입니다.
 
 지난 7/30~31, SSAFYnity 집행부는 MT를 다녀왔습니다.
 

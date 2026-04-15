@@ -1,26 +1,22 @@
 ---
-title: "[SSAFYnity] 가을 체육대회 (2023.9.23)"
+title: "팀워크와 열기로 가득했던 가을 체육대회"
 description: ""
 pubDate: 2023-09-25
 category: journal
+author:
+  operatorId: operator-001
+eventSlug: 2023-sports-day
 tags:
-  - 행사
   - 체육대회
   - 운동회
   - "2023"
 ---
 
-안녕하세요 소통팀입니다!
-
-지난 9월 23일 SSAFYnity 가을 체육대회가
-
-뚝섬한강공원 1번 축구장에서 진행되었습니다!!
+지난 9월 23일, SSAFYnity 가을 체육대회가 뚝섬한강공원 1번 축구장에서 열렸습니다.
 
 ![가을 체육대회 현장](/blog/journal/2023-fall-sports-day/01.jpg)
 
-SSAFYnity 집행부 인원들이 오랜시간에 걸쳐서 준비한 SSAFYnity가을 체육대회
-
-기대되지 않나요?!
+집행부가 오랜 시간 준비한 가을 체육대회의 현장을 함께 돌아볼까요?
 
 ![체육대회 준비](/blog/journal/2023-fall-sports-day/02.jpg)
 

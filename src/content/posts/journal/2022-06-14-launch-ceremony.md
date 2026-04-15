@@ -1,20 +1,18 @@
 ---
-title: "SSAFYnity 발대식"
+title: "SSAFYnity의 시작을 알린 발대식"
 description: ""
 pubDate: 2022-06-14
 category: journal
+author:
+  operatorId: operator-005
+eventSlug: 2022-founding-ceremony
 tags:
-  - 행사
   - 발대식
   - "2022"
   - 아카이브
 ---
 
 ![발대식 썸네일](/blog/journal/2022-launch-ceremony/01.png)
-
-안녕하세요, 싸피 동문회 여러분!
-
-홍보국입니다.
 
 지난 9일, SSAFYnity의 시작을 알리는 발대식이 열렸습니다.
 

@@ -1,25 +1,19 @@
 ---
-title: "싸피인의 밤 (2023.01.14)"
+title: "추억과 웃음으로 채운 첫 번째 싸피인의 밤"
 description: ""
 pubDate: 2023-01-19
 category: journal
+author:
+  operatorId: operator-003
+eventSlug: 2023-night-of-ssafynity
 tags:
-  - 행사
   - 싸피인의밤
   - "2023"
 ---
 
 ![싸피인의 밤 포스터](/blog/journal/2023-night-of-ssafynity/01.png)
 
-안녕하세요! 싸피니티 동문회 여러분!
-
-기획국장입니다.
-
-즐겁게 잘 마무리 된,
-
-싸피인의 밤!
-
-우리들의 행복한 기억을 다시 되돌아봅시다!
+즐겁게 마무리된 싸피인의 밤의 순간들을 다시 되돌아봅시다!
 
 ![행사장 준비 1](/blog/journal/2023-night-of-ssafynity/02.jpg)
 

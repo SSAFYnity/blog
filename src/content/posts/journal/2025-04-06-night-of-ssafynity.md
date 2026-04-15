@@ -1,15 +1,15 @@
 ---
-title: "[SSAFYnity] 싸피인의 밤 (25.03.08)"
+title: "노란 테마와 웃음으로 채운 2025 싸피인의 밤"
 description: ""
 pubDate: 2025-04-06
 category: journal
+author:
+  operatorId: operator-073
+eventSlug: 2025-night-of-ssafynity
 tags:
-  - 행사
   - 싸피인의밤
   - "2025"
 ---
-
-안녕하세요! 싸피니티 홍보팀 이가빈입니다.
 
 지난 3월 8일 싸피인의 밤 행사가 무사히 마무리되었습니다!
 

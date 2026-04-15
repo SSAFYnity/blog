@@ -1,18 +1,18 @@
 ---
-title: "[SSAFYnity] 가을 체육대회 (2024.9.28)"
+title: "초가을 바람 속에서 함께한 가을 체육대회"
 description: ""
 pubDate: 2024-10-25
 category: journal
+author:
+  operatorId: operator-053
+eventSlug: 2024-sports-day
 tags:
-  - 행사
   - 체육대회
   - SSAFYnity운동회
   - "2024"
 ---
 
-안녕하세요 SSAFYnity 집행부입니다.
-
-24년도 3분기 행사로 가을 체육대회가 개최되었습니다.
+2024년 3분기 행사로 가을 체육대회가 열렸습니다.
 
 일시 : 2024/9/28(토)
 

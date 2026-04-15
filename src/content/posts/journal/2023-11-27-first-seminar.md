@@ -1,20 +1,18 @@
 ---
-title: "[SSAFYnity] 제 1회 싸피니티 세미나(2023.11.25)"
+title: "뜨거운 열기로 함께한 제1회 싸피니티 세미나"
 description: ""
 pubDate: 2023-11-27
 category: journal
+author:
+  operatorId: operator-001
+eventSlug: 2023-seminar
 tags:
-  - 행사
   - 세미나
   - SSAFYnity
   - "2023"
 ---
 
-안녕하세요 소통팀입니다!
-
-지난 11월 25일 SSAFYnity 제 1회 세미나가
-
-역삼 멀티캠퍼스에서 진행되었습니다!
+지난 11월 25일, SSAFYnity 제1회 세미나가 역삼 멀티캠퍼스에서 열렸습니다.
 
 ![세미나 현장](/blog/journal/2023-first-seminar/01.jpg)
 

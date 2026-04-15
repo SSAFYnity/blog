@@ -1,24 +1,20 @@
 ---
-title: "SSAFYnity 첫 번째 개발 행사 SSAFYnale !!"
+title: "개발 경험과 기술을 나눈 첫 SSAFYnale"
 description: ""
 pubDate: 2023-06-14
 category: journal
+author:
+  operatorId: operator-042
+eventSlug: 2023-ssafynale
 tags:
-  - 행사
   - SSAFYnale
   - 개발
   - "2023"
 ---
 
-안녕하세요. SSAFYnity 여러분!
+지난 6월 10일, SSAFY 수료생들의 경험과 기술을 나누는 SSAFYnale가 열렸습니다.
 
-2대 집행부 진행소통국 김승화입니다.
-
-지난 6월 10일에 SSAFY 수료생들만의 경험과 기술을 공유하는 SSAFYnale가 열렸던 것 알고 계신가요?
-
-(몰랐다면.....)
-
-우선 그 날 행사에 발표해주신 발표자 분들과 참여해주신 SSAFYnity 회원 분들에게 감사를 전달합니다!
+발표자분들과 함께해주신 SSAFYnity 회원분들께 다시 한 번 감사드립니다.
 
 ![행사 시작](/blog/journal/2023-ssafynale/01.jpg)
 
