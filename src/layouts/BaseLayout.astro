@@ -2,11 +2,15 @@
 import SiteFooter from '../components/SiteFooter.astro'
 import SiteHeader from '../components/SiteHeader.astro'
 import '../styles/global.css'
-import { site } from '../data/site'
+import { site, toAbsoluteBlogUrl } from '../data/site'
 
 interface Props {
   title?: string
   description?: string
+  canonical?: string
+  image?: string
+  metaType?: 'website' | 'article'
+  noindex?: boolean
   analyticsEvent?: {
     name: string
     params?: Record<string, string>
@@ -16,6 +20,10 @@ interface Props {
 const {
   title = site.title,
   description = site.description,
+  canonical = toAbsoluteBlogUrl(Astro.url.pathname),
+  image = site.ogImage,
+  metaType = 'website',
+  noindex = false,
   analyticsEvent,
 } = Astro.props
 
@@ -29,14 +37,31 @@ const isAnalyticsEnabled = import.meta.env.PROD && GA_MEASUREMENT_ID.length > 0
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
     <meta name="theme-color" content="#1E3A8A" />
+    <meta
+      name="google-site-verification"
+      content="xWE3kfqYc75gEiII_BGzPNT7R_eHhDrBGHW7OlLz1-M"
+    />
     <link rel="icon" type="image/x-icon" href="/blog/favicon.ico" />
     <link rel="icon" type="image/svg+xml" href="/blog/logo-icon.svg" />
     <link rel="apple-touch-icon" href="/blog/logo-icon.svg" />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={metaType} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={image} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={image} />
     <title>{title}</title>
     {isAnalyticsEnabled && (
       <>
         <script
+          is:inline
           async
           src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
         ></script>

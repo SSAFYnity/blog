@@ -11,6 +11,7 @@ export const site = {
   description: '공지, 일지, 연재, 기술, 후기, 회비 기록을 담는 SSAFYnity 공식 블로그',
   slogan: '싸피 수료생들이 직접 운영하는 동문회의 공식 블로그',
   baseUrl: 'https://ssafynity.github.io/blog',
+  ogImage: 'https://ssafynity.github.io/blog/logo-rect.png',
   links: {
     home: 'https://ssafynity.github.io',
     policyPaths: {
@@ -85,6 +86,26 @@ export const site = {
 } as const
 
 export const getOfficialUrl = (path: string) => `${site.links.home}${path}`
+
+const FILE_PATH_PATTERN = /\/[^/]+\.[a-z0-9]+$/i
+
+export function normalizeSitePath(pathname: string) {
+  if (!pathname || pathname === '/') {
+    return '/'
+  }
+
+  const normalizedPath = pathname.startsWith('/') ? pathname : `/${pathname}`
+
+  if (FILE_PATH_PATTERN.test(normalizedPath)) {
+    return normalizedPath
+  }
+
+  return normalizedPath.endsWith('/') ? normalizedPath : `${normalizedPath}/`
+}
+
+export function toAbsoluteBlogUrl(pathname: string) {
+  return `${site.links.home}${normalizeSitePath(pathname)}`
+}
 
 export type Category = (typeof site.categories)[number]
 export type CategorySlug = Category['slug']
