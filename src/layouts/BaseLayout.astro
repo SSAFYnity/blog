@@ -76,12 +76,17 @@ const isAnalyticsEnabled = import.meta.env.PROD && GA_MEASUREMENT_ID.length > 0
     )}
   </head>
   <body>
-    <div class="page-bg" aria-hidden="true"></div>
-    <SiteHeader />
-    <main>
-      <slot />
-    </main>
-    <SiteFooter />
+    <div class="page-bg" aria-hidden="true">
+      <div class="page-orb page-orb-primary"></div>
+      <div class="page-orb page-orb-secondary"></div>
+    </div>
+    <div class="page-shell">
+      <SiteHeader />
+      <main class="page-main">
+        <slot />
+      </main>
+      <SiteFooter />
+    </div>
     {isAnalyticsEnabled && (
       <script is:inline>
         window.gtag && window.gtag('event', 'page_view', {
@@ -136,5 +141,32 @@ const isAnalyticsEnabled = import.meta.env.PROD && GA_MEASUREMENT_ID.length > 0
         });
       </script>
     )}
+    <script is:inline>
+      (() => {
+        const selector = '.astro-reveal, [data-reveal]';
+        const reveals = Array.from(document.querySelectorAll(selector));
+
+        if ('IntersectionObserver' in window && reveals.length > 0) {
+          const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+              if (!entry.isIntersecting) return;
+
+              const target = entry.target;
+              const delay = target.getAttribute('data-reveal-delay');
+              if (delay) {
+                target.style.transitionDelay = `${delay}ms`;
+              }
+
+              target.classList.add('is-visible');
+              observer.unobserve(target);
+            });
+          }, { threshold: 0.12 });
+
+          reveals.forEach((element) => observer.observe(element));
+        } else {
+          reveals.forEach((element) => element.classList.add('is-visible'));
+        }
+      })();
+    </script>
   </body>
 </html>
