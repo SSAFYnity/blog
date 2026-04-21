@@ -5,6 +5,15 @@
 // [주의] 공개된 slug는 가능하면 변경하지 않습니다.
 // 함께 확인: /Users/hyeona/Dev/SSAFYnity/ssafynity.github.io/src/data/events/index.ts
 // 함께 확인: /Users/hyeona/Dev/SSAFYnity/ssafynity.github.io/src/data/events/
+type EventArchiveKind = 'regular' | 'ongoing' | 'special'
+
+type EventArchiveItem = {
+  slug: string
+  title: string
+  kind?: EventArchiveKind
+  eventDateLabel?: string
+}
+
 export const eventArchive = [
   { slug: '2022-founding-ceremony', title: 'SSAFYnity 발대식', kind: 'special', eventDateLabel: '2022년 6월 9일 · 19:00 - 21:00' },
   { slug: '2022-operator-mt', title: '1대 집행부 MT', eventDateLabel: '2022년 7월 30일 17:00 - 7월 31일 11:00' },
@@ -31,7 +40,7 @@ export const eventArchive = [
   { slug: '2025-ssafynale', title: '제 3회 SSAFYnale', kind: 'regular' },
   { slug: '2025-potluck-party', title: '포트락 파티', kind: 'regular' },
   { slug: '2025-career-party', title: '커리어파티', kind: 'regular' },
-] as const
+] as const satisfies readonly EventArchiveItem[]
 
 export const eventKindLabels = {
   regular: '정기 행사',
@@ -39,14 +48,16 @@ export const eventKindLabels = {
   special: '단발성 행사',
 } as const
 
+export type EventArchiveSlug = (typeof eventArchive)[number]['slug']
+
 export const eventArchiveSlugs = eventArchive.map((event) => event.slug) as [
-  (typeof eventArchive)[number]['slug'],
-  ...(typeof eventArchive)[number]['slug'][]
+  EventArchiveSlug,
+  ...EventArchiveSlug[]
 ]
 
 export const eventArchiveMap = Object.fromEntries(
   eventArchive.map((event) => [event.slug, event])
-) as Record<(typeof eventArchive)[number]['slug'], (typeof eventArchive)[number]>
+) as Record<EventArchiveSlug, EventArchiveItem>
 
 function getOfficialSiteBaseUrl() {
   if (import.meta.env.DEV) {
@@ -61,6 +72,6 @@ function getOfficialSiteBaseUrl() {
   return 'https://ssafynity.github.io'
 }
 
-export function getEventArchiveUrl(slug: (typeof eventArchive)[number]['slug']) {
+export function getEventArchiveUrl(slug: EventArchiveSlug) {
   return `${getOfficialSiteBaseUrl()}/events/archive/${slug}`
 }

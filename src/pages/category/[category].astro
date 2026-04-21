@@ -250,96 +250,100 @@ const reviewColumns =
       <div class="review-feed" data-filter-list data-review-layout="columns">
         {reviewColumns.map((column, columnIndex) => (
           <div class="review-column" data-review-column data-column-index={columnIndex}>
-            {column.map(({ post, Content }) => (
-              <div
-                class="review-entry-shell"
-                data-review-shell
-                data-filter-item
-                data-date={post.data.pubDate.toISOString()}
-                data-year={String(post.data.pubDate.getFullYear())}
-                data-event={getPostEventSlug(post) ?? ''}
-                data-kind={getPostEventSlug(post) ? eventArchiveMap[getPostEventSlug(post)]?.kind ?? '' : ''}
-                data-audience={post.data.review?.authorType ?? ''}
-                data-tags={post.data.tags.join('|')}
-                data-search={buildArchiveSearchText(post)}
-              >
-                <article
-                  id={post.slug}
-                  class="review-entry"
-                  data-review-entry
+            {column.map(({ post, Content }) => {
+              const eventSlug = getPostEventSlug(post)
+
+              return (
+                <div
+                  class="review-entry-shell"
+                  data-review-shell
+                  data-filter-item
+                  data-date={post.data.pubDate.toISOString()}
+                  data-year={String(post.data.pubDate.getFullYear())}
+                  data-event={eventSlug ?? ''}
+                  data-kind={eventSlug ? eventArchiveMap[eventSlug]?.kind ?? '' : ''}
+                  data-audience={post.data.review?.authorType ?? ''}
+                  data-tags={post.data.tags.join('|')}
+                  data-search={buildArchiveSearchText(post)}
                 >
-                  <div class="review-entry-meta">
-                    {getPostEventSlug(post) && (
-                      <a
-                        class="review-event-link"
-                        href={getEventArchiveUrl(getPostEventSlug(post)!)}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        {eventArchiveMap[getPostEventSlug(post)!].title}
-                      </a>
-                    )}
-
-                    {post.data.review?.authorType && (
-                      <span
-                        class:list={[
-                          'review-audience-badge',
-                          post.data.review.authorType === 'member'
-                            ? 'is-member'
-                            : 'is-guest',
-                        ]}
-                      >
-                        {reviewAudienceLabels[post.data.review.authorType]}
-                      </span>
-                    )}
-
-                    {formatReviewAuthor(post.data.review) && (
-                      <span class="review-author">{formatReviewAuthor(post.data.review)}</span>
-                    )}
-                  </div>
-
-                  <div class="review-body" data-review-body>
-                    <div class="prose review-prose review-prose-only" data-review-body-inner>
-                      <Content />
-                    </div>
-                  </div>
-
-                  <div class="review-entry-foot">
-                    <time class="review-date" datetime={post.data.pubDate.toISOString()}>
-                      {formatArchiveDate(post.data.pubDate)}
-                    </time>
-
-                    <div class="review-actions">
-                      <button class="review-toggle" type="button" data-review-toggle hidden>
-                        더보기
-                      </button>
-
-                      {post.data.review?.link && (
+                  <article
+                    id={post.slug}
+                    class="review-entry"
+                    data-review-entry
+                  >
+                    <div class="review-entry-meta">
+                      {eventSlug && (
                         <a
-                          class="review-anchor"
-                          href={post.data.review.link}
+                          class="review-event-link"
+                          href={getEventArchiveUrl(eventSlug)}
                           target="_blank"
                           rel="noreferrer"
-                          aria-label={`${getReviewAuthorDisplayName(post.data.review) ?? post.data.review.name} 링크 열기`}
-                          title={`${getReviewAuthorDisplayName(post.data.review) ?? post.data.review.name} 링크 열기`}
                         >
-                          <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <path
-                              d="M7 17 17 7M9 7h8v8"
-                              fill="none"
-                              stroke="currentColor"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="1.8"
-                            />
-                          </svg>
+                          {eventArchiveMap[eventSlug].title}
                         </a>
                       )}
+
+                      {post.data.review?.authorType && (
+                        <span
+                          class:list={[
+                            'review-audience-badge',
+                            post.data.review.authorType === 'member'
+                              ? 'is-member'
+                              : 'is-guest',
+                          ]}
+                        >
+                          {reviewAudienceLabels[post.data.review.authorType]}
+                        </span>
+                      )}
+
+                      {formatReviewAuthor(post.data.review) && (
+                        <span class="review-author">{formatReviewAuthor(post.data.review)}</span>
+                      )}
                     </div>
-                  </div>
-                </article>
-              </div>
-            ))}
+
+                    <div class="review-body" data-review-body>
+                      <div class="prose review-prose review-prose-only" data-review-body-inner>
+                        <Content />
+                      </div>
+                    </div>
+
+                    <div class="review-entry-foot">
+                      <time class="review-date" datetime={post.data.pubDate.toISOString()}>
+                        {formatArchiveDate(post.data.pubDate)}
+                      </time>
+
+                      <div class="review-actions">
+                        <button class="review-toggle" type="button" data-review-toggle hidden>
+                          더보기
+                        </button>
+
+                        {post.data.review?.link && (
+                          <a
+                            class="review-anchor"
+                            href={post.data.review.link}
+                            target="_blank"
+                            rel="noreferrer"
+                            aria-label={`${getReviewAuthorDisplayName(post.data.review) ?? post.data.review.name} 링크 열기`}
+                            title={`${getReviewAuthorDisplayName(post.data.review) ?? post.data.review.name} 링크 열기`}
+                          >
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                              <path
+                                d="M7 17 17 7M9 7h8v8"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="1.8"
+                              />
+                            </svg>
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  </article>
+                </div>
+              )
+            })}
           </div>
         ))}
       </div>
