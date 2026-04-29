@@ -4146,3 +4146,101 @@ body {
     font-size: clamp(2rem, 10vw, 2.6rem);
   }
 }
+
+/* Canonical mobile header/drawer rules.
+   This file contains legacy duplicated header styles, so we restate the
+   final behavior here to keep mobile navigation deterministic. */
+.site-header {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+}
+
+.site-header.is-home {
+  background: #edf1f8;
+  backdrop-filter: none;
+}
+
+.site-header.is-scrolled,
+.site-header.is-mobile-open {
+  background: rgba(255, 255, 255, 0.95);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.95);
+  box-shadow: 0 14px 40px rgba(15, 23, 42, 0.05);
+  backdrop-filter: blur(12px);
+}
+
+.header-inner {
+  min-height: 76px;
+  padding: 16px 0;
+  gap: 20px;
+}
+
+.site-header.is-scrolled .header-inner,
+.site-header.is-mobile-open .header-inner {
+  min-height: 64px;
+  padding: 12px 0;
+}
+
+.mobile-nav-drawer {
+  border-left: 1px solid rgba(226, 232, 240, 0.95);
+  box-shadow: -24px 0 64px rgba(15, 23, 42, 0.14);
+}
+
+@media (max-width: 1023px) {
+  .site-header .nav {
+    display: none;
+  }
+
+  .mobile-nav-toggle {
+    display: inline-flex;
+  }
+
+  .mobile-nav-backdrop,
+  .mobile-nav-drawer {
+    display: block;
+  }
+}
+
+@media (max-width: 720px) {
+  .mobile-nav-drawer {
+    width: 100vw;
+  }
+
+  .brand-logo {
+    height: 36px;
+  }
+
+  .brand {
+    gap: 10px;
+  }
+
+  .brand-copy {
+    display: flex;
+    gap: 1px;
+  }
+
+  .brand-copy strong {
+    font-size: 1.125rem;
+  }
+
+  .brand-copy span {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+  }
+
+  .header-inner {
+    gap: 16px;
+    padding: 14px 0;
+  }
+
+  .site-header.is-scrolled .header-inner,
+  .site-header.is-mobile-open .header-inner {
+    padding: 12px 0;
+  }
+
+  .mobile-nav-shell {
+    padding:
+      calc(3.5rem + env(safe-area-inset-top))
+      20px
+      calc(env(safe-area-inset-bottom) + 24px);
+  }
+}
