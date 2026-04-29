@@ -3645,10 +3645,35 @@ body {
   letter-spacing: -0.02em;
 }
 
-.category-intro-grid,
-.review-invite-links,
-.archive-policy-list {
+.category-intro-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
+}
+
+.review-invite-links {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.archive-policy-list {
+  grid-template-columns: 1fr;
+  gap: 18px;
+}
+
+@media (max-width: 900px) {
+  .category-intro-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .category-intro-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .review-invite-links {
+    grid-template-columns: 1fr;
+  }
 }
 
 .category-intro-card,
