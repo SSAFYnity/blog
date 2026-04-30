@@ -805,6 +805,22 @@ p {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.post-grid.is-series {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 1180px) {
+  .post-grid.is-series {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .post-grid.is-series {
+    grid-template-columns: 1fr;
+  }
+}
+
 .magazine-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -909,6 +925,18 @@ p {
   gap: 12px;
   font-size: 0.8125rem;
   color: var(--text-muted);
+}
+
+.post-meta-row time:only-child {
+  margin-left: auto;
+}
+
+.post-series-card-meta {
+  min-width: 0;
+  color: #1e3a8a;
+  font-size: 0.78rem;
+  font-weight: 900;
+  line-height: 1.45;
 }
 
 .pill {
@@ -1091,6 +1119,33 @@ p {
   font-size: 0.75rem;
   font-weight: 700;
   color: #64748b;
+}
+
+.post-card-series .post-card-link {
+  margin-top: 0;
+}
+
+.series-card-foot {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: auto;
+  padding-top: 12px;
+}
+
+.series-card-foot .tag-list {
+  flex: 1 1 auto;
+  margin: 0;
+}
+
+.series-card-foot time {
+  flex: 0 0 auto;
+  color: #64748b;
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1.8;
+  white-space: nowrap;
 }
 
 .post-detail-shell {

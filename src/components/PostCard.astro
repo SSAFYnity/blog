@@ -10,9 +10,24 @@ interface Props {
   category: CategorySlug
   coverImage?: string
   tags?: string[]
+  metaLabel?: string
+  hideCategory?: boolean
+  variant?: 'default' | 'series'
 }
 
-const { href, slug, title, description, pubDate, category, coverImage, tags = [] } = Astro.props
+const {
+  href,
+  slug,
+  title,
+  description,
+  pubDate,
+  category,
+  coverImage,
+  tags = [],
+  metaLabel,
+  hideCategory = false,
+  variant = 'default',
+} = Astro.props
 
 const dateLabel = new Intl.DateTimeFormat('ko-KR', {
   year: 'numeric',
@@ -29,7 +44,7 @@ const analyticsPayload = JSON.stringify({
 })
 ---
 
-<article class="post-card">
+<article class:list={['post-card', variant === 'series' && 'post-card-series']}>
   {coverImage && (
     <a
       class="post-card-cover"
@@ -42,26 +57,56 @@ const analyticsPayload = JSON.stringify({
     </a>
   )}
 
-  <div class="post-meta-row">
-    <span class:list={['pill', categoryStyles[category] ?? 'is-slate']}>{getCategoryTitle(category)}</span>
-    <time datetime={pubDate.toISOString()}>{dateLabel}</time>
-  </div>
+  {variant === 'series' ? (
+    <>
+      <a
+        class="post-card-link"
+        href={href}
+        data-analytics-event="select_blog_post"
+        data-analytics-payload={analyticsPayload}
+      >
+        <h3>{title}</h3>
+      </a>
 
-  <a
-    class="post-card-link"
-    href={href}
-    data-analytics-event="select_blog_post"
-    data-analytics-payload={analyticsPayload}
-  >
-    <h3>{title}</h3>
-    <p>{description}</p>
-  </a>
+      <div class="series-card-foot">
+        {tags.length > 0 && (
+          <ul class="tag-list" aria-label="태그">
+            {tags.map((tag) => (
+              <li>#{tag}</li>
+            ))}
+          </ul>
+        )}
+        <time datetime={pubDate.toISOString()}>{dateLabel}</time>
+      </div>
+    </>
+  ) : (
+    <>
+      <div class="post-meta-row">
+        {metaLabel ? (
+          <span class="post-series-card-meta">{metaLabel}</span>
+        ) : !hideCategory && (
+          <span class:list={['pill', categoryStyles[category] ?? 'is-slate']}>{getCategoryTitle(category)}</span>
+        )}
+        <time datetime={pubDate.toISOString()}>{dateLabel}</time>
+      </div>
 
-  {tags.length > 0 && (
-    <ul class="tag-list" aria-label="태그">
-      {tags.map((tag) => (
-        <li>#{tag}</li>
-      ))}
-    </ul>
+      <a
+        class="post-card-link"
+        href={href}
+        data-analytics-event="select_blog_post"
+        data-analytics-payload={analyticsPayload}
+      >
+        <h3>{title}</h3>
+        {description && <p>{description}</p>}
+      </a>
+
+      {tags.length > 0 && (
+        <ul class="tag-list" aria-label="태그">
+          {tags.map((tag) => (
+            <li>#{tag}</li>
+          ))}
+        </ul>
+      )}
+    </>
   )}
 </article>

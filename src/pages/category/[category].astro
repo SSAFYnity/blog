@@ -221,7 +221,7 @@ const reviewColumns =
     )}
 
     {posts.length > 0 && (category.slug === 'series' || category.slug === 'tech') && (
-      <div class="post-grid" data-filter-list>
+      <div class:list={['post-grid', category.slug === 'series' && 'is-series']} data-filter-list>
         {posts.map((post) => (
           <div
             data-filter-item
@@ -240,6 +240,8 @@ const reviewColumns =
               category={post.data.category}
               coverImage={post.data.coverImage}
               tags={post.data.tags}
+              hideCategory={post.data.category === 'series'}
+              variant={post.data.category === 'series' ? 'series' : 'default'}
             />
           </div>
         ))}
