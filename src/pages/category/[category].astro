@@ -3,7 +3,7 @@ import { getCollection, render } from 'astro:content'
 import BaseLayout from '../../layouts/BaseLayout.astro'
 import PostCard from '../../components/PostCard.astro'
 import { archiveEmptyMessages, archiveFilterLabels, archiveYearOptions, reviewAudienceLabels } from '../../data/archive'
-import { categoryMap, categoryStyles, getCategoryTitle, site } from '../../data/site'
+import { categoryMap, site } from '../../data/site'
 import { eventArchiveMap, eventKindLabels, getEventArchiveUrl } from '../../data/eventArchive'
 import { buildArchiveSearchText, formatArchiveDate, formatReviewAuthor, getPostEventSlug, getReviewAuthorDisplayName } from '../../lib/archive'
 import { isPublicPost } from '../../lib/content'
@@ -364,8 +364,17 @@ const reviewColumns =
     {posts.length > 0 && category.slug === 'finance' && (
       <div class="finance-list" data-filter-list>
         {posts.map((post) => (
-          <article
-            class="finance-card"
+          <a
+            class="finance-row"
+            href={`/blog/${post.slug}/`}
+            data-analytics-event="select_blog_post"
+            data-analytics-payload={JSON.stringify({
+              post_slug: post.slug,
+              post_title: post.data.title,
+              post_category: post.data.category,
+              destination_url: `/blog/${post.slug}/`,
+              source_area: 'category_finance',
+            })}
             data-filter-item
             data-date={post.data.pubDate.toISOString()}
             data-year={String(post.data.pubDate.getFullYear())}
@@ -373,25 +382,19 @@ const reviewColumns =
             data-tags={post.data.tags.join('|')}
             data-search={buildArchiveSearchText(post)}
           >
-            <div class="finance-card-top">
-              <span class={`pill ${categoryStyles[post.data.category]}`}>{getCategoryTitle(post.data.category)}</span>
-              <time datetime={post.data.pubDate.toISOString()}>{formatArchiveDate(post.data.pubDate)}</time>
-            </div>
-            <a
-              href={`/blog/${post.slug}/`}
-              data-analytics-event="select_blog_post"
-              data-analytics-payload={JSON.stringify({
-                post_slug: post.slug,
-                post_title: post.data.title,
-                post_category: post.data.category,
-                destination_url: `/blog/${post.slug}/`,
-                source_area: 'category_finance',
-              })}
-            >
+            <div class="finance-row-body">
               <h2>{post.data.title}</h2>
               <p>{post.data.description}</p>
-            </a>
-          </article>
+              {post.data.tags.length > 0 && (
+                <ul class="finance-tag-list" aria-label="태그">
+                  {post.data.tags.map((tag) => (
+                    <li>#{tag}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            <time datetime={post.data.pubDate.toISOString()}>{formatArchiveDate(post.data.pubDate)}</time>
+          </a>
         ))}
       </div>
     )}

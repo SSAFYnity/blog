@@ -81,7 +81,7 @@ const seriesMetaLabel =
 
       <div class:list={['post-detail-main', hasAside && 'has-aside', post.data.category === 'journal' && 'is-journal']}>
         <article class="post-detail">
-          <div class="prose">
+          <div class:list={['prose', post.data.category === 'finance' && 'is-finance-prose']} data-finance-prose={post.data.category === 'finance' ? '' : undefined}>
             <Content />
           </div>
         </article>
@@ -190,3 +190,69 @@ const seriesMetaLabel =
     </div>
   </section>
 </BaseLayout>
+
+{post.data.category === 'finance' && (
+  <script is:inline>
+    const financeProse = document.querySelector('[data-finance-prose]')
+    const receiptHeading = [...(financeProse?.querySelectorAll('h2') ?? [])].find((heading) =>
+      heading.textContent?.trim().includes('영수증 첨부')
+    )
+
+    if (receiptHeading) {
+      let receiptList = null
+      let nextNode = receiptHeading.nextElementSibling
+
+      const ensureReceiptList = (beforeNode) => {
+        if (!receiptList) {
+          receiptList = document.createElement('div')
+          receiptList.className = 'finance-receipt-list'
+          receiptHeading.parentNode?.insertBefore(receiptList, beforeNode)
+        }
+
+        return receiptList
+      }
+
+      const createReceiptItem = (label) => {
+        const item = document.createElement('details')
+        item.className = 'finance-receipt-item'
+
+        const summary = document.createElement('summary')
+        summary.textContent = label || '영수증 이미지'
+
+        item.appendChild(summary)
+        return item
+      }
+
+      while (nextNode && nextNode.tagName !== 'H2') {
+        const currentNode = nextNode
+        nextNode = nextNode.nextElementSibling
+
+        if (currentNode.tagName === 'H3') {
+          const item = createReceiptItem(currentNode.textContent?.trim())
+          ensureReceiptList(currentNode).appendChild(item)
+
+          let groupNode = nextNode
+          while (groupNode && groupNode.tagName !== 'H2' && groupNode.tagName !== 'H3') {
+            const childNode = groupNode
+            groupNode = groupNode.nextElementSibling
+            item.appendChild(childNode)
+          }
+
+          currentNode.remove()
+          nextNode = groupNode
+          continue
+        }
+
+        const image = currentNode.tagName === 'P' ? currentNode.querySelector(':scope > img:only-child') : null
+
+        if (!image) {
+          continue
+        }
+
+        const item = createReceiptItem(image.getAttribute('alt'))
+        item.appendChild(currentNode)
+        ensureReceiptList(currentNode).appendChild(item)
+      }
+    }
+  </script>
+)}
