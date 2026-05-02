@@ -47,6 +47,18 @@ const seriesBackLabel = post.data.category === 'series' ? post.data.seriesMeta?.
 const seriesBackHref = seriesBackLabel
   ? `/blog/series/${getSeriesDirectoryMeta(seriesBackLabel).slug}/`
   : null
+const parentBackHref = seriesBackHref ?? `/blog/category/${post.data.category}/`
+const parentBackLabel = seriesBackLabel ?? `${getCategoryTitle(post.data.category)} 목록`
+const parentBackAnalyticsEvent = seriesBackHref ? 'select_series_back_link' : 'select_category_back_link'
+const parentBackAnalyticsParams = seriesBackHref
+  ? {
+      post_slug: post.slug,
+      series_label: seriesBackLabel,
+    }
+  : {
+      post_slug: post.slug,
+      post_category: post.data.category,
+    }
 ---
 
 <BaseLayout
@@ -64,22 +76,17 @@ const seriesBackHref = seriesBackLabel
   }}
 >
   <section class="post-detail-shell">
-    {seriesBackHref && seriesBackLabel && (
-      <nav class:list={['post-parent-nav shell', hasAside && 'has-aside']} aria-label="상위 시리즈">
-        <a
-          class="post-parent-link"
-          href={seriesBackHref}
-          data-analytics-event="select_series_back_link"
-          data-analytics-params={JSON.stringify({
-            post_slug: post.slug,
-            series_label: seriesBackLabel,
-          })}
-        >
-          <span aria-hidden="true">←</span>
-          {seriesBackLabel}으로 돌아가기
-        </a>
-      </nav>
-    )}
+    <nav class:list={['post-parent-nav shell', hasAside && 'has-aside']} aria-label="상위 목록">
+      <a
+        class="post-parent-link"
+        href={parentBackHref}
+        data-analytics-event={parentBackAnalyticsEvent}
+        data-analytics-params={JSON.stringify(parentBackAnalyticsParams)}
+      >
+        <span aria-hidden="true">←</span>
+        {seriesBackLabel ? `${parentBackLabel}으로 돌아가기` : `${parentBackLabel}으로 돌아가기`}
+      </a>
+    </nav>
 
     <div class:list={['post-detail-frame shell', hasAside && 'has-aside']}>
       <header class:list={['post-detail-header', post.data.category === 'journal' && 'is-journal']}>
