@@ -1,0 +1,47 @@
+---
+title: "개발자라면 공감하는 순간: 범인은 4개월 전의 나"
+description: "상용 서버 장애와 Git Blame 사이에서 마주한 개발자의 웃픈 순간을 담은 SSAFYnity 릴스입니다."
+pubDate: 2026-03-29
+category: series
+coverImage: "/blog/series/2026-developer-git-blame-reel/cover.jpg"
+tags:
+  - 개발자공감
+  - 개발자밈
+  - 릴스
+seriesMeta:
+  season: "5대 운영진"
+  team: "콘텐츠팀"
+  label: "개발자라면 공감하는 순간"
+  issueLabel: "범인은 4개월 전의 나"
+---
+
+<div class="series-video-frame">
+  <video
+    class="series-video"
+    controls
+    playsinline
+    preload="metadata"
+    poster="/blog/series/2026-developer-git-blame-reel/cover.jpg"
+    src="/blog/series/2026-developer-git-blame-reel/reel.mp4"
+  ></video>
+</div>
+
+🚨 개발자라면 무조건 공감하는 눈물겨운(?) 순간! 🚨
+
+"상용 서버 터졌는데 진짜 아무도 안 건드렸대요..."
+
+백엔드도 아니고, 프론트엔드도 모른다 하고.. 대체 누구야?? 🤷‍♂️
+
+억울해서 Git Blame 켜봤더니...
+
+🚨 범인은 4개월 전의 나 🚨 🤦‍♂️
+
+(과거의 나야, 왜 그랬니...)
+
+하루도 조용할 날이 없는 다이나믹한 개발자의 삶! 💻
+
+오늘도 모니터 앞에서 에러와 싸우고 있는 당신!
+
+SSAFYnity가 열렬히 응원합니다. 💪✨
+
+💬 여러분의 가장 '아찔했던' 혹은 '퇴사 마려웠던' 순간은 언제였나요?

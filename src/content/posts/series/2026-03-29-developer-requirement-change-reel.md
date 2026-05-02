@@ -1,0 +1,45 @@
+---
+title: "요구사항 바꼈다냥"
+description: "기획 변경과 마감 압박 사이에서 뒷목 잡는 개발자의 웃픈 순간을 담은 SSAFYnity 릴스입니다."
+pubDate: 2026-03-29T13:29:31+09:00
+category: series
+coverImage: "/blog/series/2026-developer-requirement-change-reel/cover.jpg"
+tags:
+  - 개발자공감
+  - 개발자밈
+  - 릴스
+  - 요구사항변경
+seriesMeta:
+  season: "5대 운영진"
+  team: "콘텐츠팀"
+  label: "개발자라면 공감하는 순간"
+  issueLabel: "요구사항 바꼈다냥"
+---
+
+<div class="series-video-frame">
+  <video class="series-video" controls playsinline preload="metadata" poster="/blog/series/2026-developer-requirement-change-reel/cover.jpg" src="/blog/series/2026-developer-requirement-change-reel/reel.mp4"></video>
+</div>
+
+🚨 개발자 혈압 상승 주의! 뒷목 잡는 순간 1위 🚨
+
+해맑게 웃으며 다가오는 기획자... 그 입에서 나온 청천벽력 같은 한마디!
+
+"어제 올린 기획서에 요구사항 바꼈다냥~😸"
+
+(개발자 속마음: 어제 오후는... 내가 다 짠 후라고...!!)
+
+멘붕 🤯
+
+거기에 쐐기를 박는 막타!
+
+"빠른 수정 부탁드려요! 내일 발표거든요~"
+
+(천진난만)
+
+결국 머리 뜯으며 외치는 한마디...
+
+'(저 퇴사합니다)' 😭
+
+하루도 조용할 날이 없는 다이나믹한 개발자의 삶! 💻
+
+오늘도 끝없는 기획 변경과 마감 압박 속에 분투하고 계신가요?
