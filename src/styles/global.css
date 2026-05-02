@@ -1663,19 +1663,6 @@ a.series-card-badge:focus-visible {
   font-weight: 900;
 }
 
-.archive-reset {
-  margin-left: auto;
-  border: 0;
-  background: transparent;
-  color: #94a3b8;
-  font-size: 0.74rem;
-  font-weight: 900;
-}
-
-.archive-reset:hover {
-  color: #2563eb;
-}
-
 [data-filter-item][hidden] {
   display: none !important;
 }
@@ -4438,8 +4425,7 @@ body {
 
 .archive-search input,
 .archive-search-button,
-.archive-pill-button,
-.archive-reset {
+.archive-pill-button {
   min-height: 48px;
   border-radius: 14px;
 }

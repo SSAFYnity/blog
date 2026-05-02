@@ -34,7 +34,6 @@ export const archiveFilterLabels = {
   searchButton: '검색',
   newest: '최신순',
   oldest: '오래된순',
-  reset: '초기화',
   filteredEmptyTitle: '조건에 맞는 글이 없습니다.',
   filteredEmptyDescription: '검색어 또는 필터를 조정하면 다른 아카이브를 확인할 수 있습니다.',
 } as const

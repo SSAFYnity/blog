@@ -180,9 +180,6 @@ const seriesGroups =
         </div>
       </div>
 
-      <button type="button" class="archive-reset" data-filter-reset hidden>
-        {archiveFilterLabels.reset}
-      </button>
     </div>}
 
     {posts.length === 0 && (
@@ -538,7 +535,6 @@ const seriesGroups =
   const audienceOptions = [...document.querySelectorAll('[data-filter-audience-option]')]
   const yearOptions = [...document.querySelectorAll('[data-filter-year-option]')]
   const sortOptions = [...document.querySelectorAll('[data-filter-sort-option]')]
-  const resetButton = document.querySelector('[data-filter-reset]')
   const emptyState = document.querySelector('[data-filter-empty]')
 
   if (
@@ -548,8 +544,7 @@ const seriesGroups =
     (!kindTrigger || kindTrigger instanceof HTMLButtonElement) &&
     (!audienceTrigger || audienceTrigger instanceof HTMLButtonElement) &&
     yearTrigger instanceof HTMLButtonElement &&
-    sortTrigger instanceof HTMLButtonElement &&
-    resetButton instanceof HTMLButtonElement
+    sortTrigger instanceof HTMLButtonElement
   ) {
     const items = [...filterList.querySelectorAll('[data-filter-item]')]
     const reviewColumns = [...filterList.querySelectorAll('[data-review-column]')]
@@ -618,14 +613,19 @@ const seriesGroups =
         item.toggleAttribute('hidden', !visible)
       })
 
-      redistributeReviewItems(sorted)
+      if (reviewColumns.length) {
+        redistributeReviewItems(sorted)
+      } else {
+        sorted.forEach((item) => {
+          filterList.appendChild(item)
+        })
+      }
 
       if (emptyState instanceof HTMLElement) {
         const visibleCount = items.filter((item) => !item.hasAttribute('hidden')).length
         emptyState.hidden = visibleCount > 0
       }
 
-      resetButton.hidden = !(activeQuery || activeKind || activeAudience || activeEvent || activeYear || activeSort !== 'newest')
     }
 
     const closeDropdowns = () => {
@@ -709,26 +709,6 @@ const seriesGroups =
         closeDropdowns()
         applyFilters()
       })
-    })
-
-    resetButton.addEventListener('click', () => {
-      activeQuery = ''
-      activeKind = ''
-      activeAudience = ''
-      activeEvent = ''
-      activeYear = ''
-      activeSort = 'newest'
-      searchInput.value = ''
-      if (kindTrigger instanceof HTMLButtonElement) kindTrigger.textContent = '종류'
-      if (audienceTrigger instanceof HTMLButtonElement) audienceTrigger.textContent = '작성자'
-      yearTrigger.textContent = '연도'
-      sortTrigger.textContent = '최신순'
-      kindOptions.forEach((option) => option.classList.toggle('is-selected', (option.dataset.value ?? '') === ''))
-      audienceOptions.forEach((option) => option.classList.toggle('is-selected', (option.dataset.value ?? '') === ''))
-      yearOptions.forEach((option) => option.classList.toggle('is-selected', (option.dataset.value ?? '') === ''))
-      sortOptions.forEach((option) => option.classList.toggle('is-selected', option.dataset.value === 'newest'))
-      window.history.replaceState({}, '', window.location.pathname)
-      applyFilters()
     })
 
     applyFilters()

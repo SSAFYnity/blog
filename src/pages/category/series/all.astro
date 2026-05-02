@@ -127,9 +127,6 @@ const getPostSeriesHref = (post: (typeof posts)[number]) =>
           </div>
         </div>
 
-        <button type="button" class="archive-reset" data-filter-reset hidden>
-          {archiveFilterLabels.reset}
-        </button>
       </div>
 
       <div class="post-grid is-series" data-filter-list>
@@ -179,7 +176,6 @@ const getPostSeriesHref = (post: (typeof posts)[number]) =>
   const seriesOptions = [...document.querySelectorAll('[data-filter-series-option]')]
   const yearOptions = [...document.querySelectorAll('[data-filter-year-option]')]
   const sortOptions = [...document.querySelectorAll('[data-filter-sort-option]')]
-  const resetButton = document.querySelector('[data-filter-reset]')
   const emptyState = document.querySelector('[data-filter-empty]')
 
   if (
@@ -188,8 +184,7 @@ const getPostSeriesHref = (post: (typeof posts)[number]) =>
     searchSubmit instanceof HTMLButtonElement &&
     seriesTrigger instanceof HTMLButtonElement &&
     yearTrigger instanceof HTMLButtonElement &&
-    sortTrigger instanceof HTMLButtonElement &&
-    resetButton instanceof HTMLButtonElement
+    sortTrigger instanceof HTMLButtonElement
   ) {
     const items = [...filterList.querySelectorAll('[data-filter-item]')]
     let activeQuery = ''
@@ -221,7 +216,6 @@ const getPostSeriesHref = (post: (typeof posts)[number]) =>
         emptyState.hidden = items.some((item) => !item.hasAttribute('hidden'))
       }
 
-      resetButton.hidden = !(activeQuery || activeSeries || activeYear || activeSort !== 'newest')
     }
 
     const closeDropdowns = () => {
@@ -288,21 +282,6 @@ const getPostSeriesHref = (post: (typeof posts)[number]) =>
         closeDropdowns()
         applyFilters()
       })
-    })
-
-    resetButton.addEventListener('click', () => {
-      activeQuery = ''
-      activeSeries = ''
-      activeYear = ''
-      activeSort = 'newest'
-      searchInput.value = ''
-      seriesTrigger.textContent = '시리즈'
-      yearTrigger.textContent = '연도'
-      sortTrigger.textContent = '최신순'
-      seriesOptions.forEach((option) => option.classList.toggle('is-selected', (option.dataset.value ?? '') === ''))
-      yearOptions.forEach((option) => option.classList.toggle('is-selected', (option.dataset.value ?? '') === ''))
-      sortOptions.forEach((option) => option.classList.toggle('is-selected', option.dataset.value === 'newest'))
-      applyFilters()
     })
 
     applyFilters()
