@@ -1,0 +1,99 @@
+---
+import { getCollection } from 'astro:content'
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import PostCard from '../../components/PostCard.astro'
+import { getSeriesDirectoryMeta, getSeriesLabelBySlug } from '../../data/series'
+import { isPublicPost } from '../../lib/content'
+
+export async function getStaticPaths() {
+  const posts = (await getCollection('posts'))
+    .filter((post) => isPublicPost(post) && post.data.category === 'series')
+
+  const groups = posts.reduce((map, post) => {
+    const label = post.data.seriesMeta?.label ?? post.data.title
+    const groupPosts = map.get(label) ?? []
+    groupPosts.push(post)
+    map.set(label, groupPosts)
+    return map
+  }, new Map<string, typeof posts>())
+
+  return Array.from(groups.entries()).map(([label, groupPosts]) => {
+    const meta = getSeriesDirectoryMeta(label)
+    return {
+      params: { series: meta.slug },
+      props: {
+        label,
+        meta,
+        posts: groupPosts.sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime()),
+      },
+    }
+  })
+}
+
+const { label, meta, posts } = Astro.props
+const seriesLabel = label ?? getSeriesLabelBySlug(Astro.params.series ?? '') ?? '연재 시리즈'
+const newestYear = posts[0].data.pubDate.getFullYear()
+const oldestYear = posts[posts.length - 1].data.pubDate.getFullYear()
+const seriesPeriodLabel = newestYear === oldestYear ? `${newestYear}년` : `${oldestYear}-${newestYear}년`
+---
+
+<BaseLayout
+  title={`${seriesLabel} | SSAFYnity 블로그`}
+  description={meta.description}
+  analyticsEvent={{
+    name: 'view_series_group',
+    params: {
+      series_label: seriesLabel,
+      series_slug: Astro.params.series ?? '',
+    },
+  }}
+>
+  <section class="archive-hero-band archive-hero-band-category">
+    <div class="archive-hero archive-hero-category shell">
+      <p class="eyebrow">{meta.eyebrow}</p>
+      <h1>{seriesLabel}</h1>
+      <p class="archive-copy">{meta.description}</p>
+    </div>
+  </section>
+
+  <section class="section section-muted archive-section-band">
+    <div class="shell archive-section">
+      <div class="series-view-switch" aria-label="연재 보기 방식">
+        <a class="series-view-link" href="/blog/category/series/">시리즈별</a>
+        <a class="series-view-link" href="/blog/category/series/all/">전체 글</a>
+        <span class="series-view-link is-active" aria-current="page">현재 시리즈</span>
+      </div>
+
+      <div class="series-detail-summary">
+        <span class="series-detail-stat">
+          <span>글 수</span>
+          <strong>{posts.length}편</strong>
+        </span>
+        <span class="series-detail-stat">
+          <span>기간</span>
+          <strong>{seriesPeriodLabel}</strong>
+        </span>
+      </div>
+
+      <div class="post-grid is-series">
+        {posts.map((post) => (
+          <PostCard
+            href={`/blog/${post.slug}/`}
+            slug={post.slug}
+            title={post.data.title}
+            description={post.data.description}
+            pubDate={post.data.pubDate}
+            category={post.data.category}
+            coverImage={post.data.coverImage}
+            tags={post.data.tags}
+            seriesLabel={post.data.seriesMeta?.label}
+            seriesHref={`/blog/series/${meta.slug}/`}
+            issueLabel={post.data.seriesMeta?.issueLabel}
+            hideCategory
+            variant="series"
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>

@@ -5,6 +5,7 @@ import PostCard from '../../components/PostCard.astro'
 import { archiveEmptyMessages, archiveFilterLabels, archiveYearOptions, reviewAudienceLabels } from '../../data/archive'
 import { categoryMap, site } from '../../data/site'
 import { eventArchiveMap, eventKindLabels, getEventArchiveUrl } from '../../data/eventArchive'
+import { getSeriesDirectoryMeta } from '../../data/series'
 import { buildArchiveSearchText, formatArchiveDate, formatReviewAuthor, getPostEventSlug, getReviewAuthorDisplayName } from '../../lib/archive'
 import { isPublicPost } from '../../lib/content'
 
@@ -49,6 +50,40 @@ const reviewColumns =
       )
     : []
 
+const seriesGroups =
+  category.slug === 'series'
+    ? Array.from(
+        posts
+          .reduce((groups, post) => {
+            const label = post.data.seriesMeta?.label ?? post.data.title
+            const groupPosts = groups.get(label) ?? []
+            groupPosts.push(post)
+            groups.set(label, groupPosts)
+            return groups
+          }, new Map<string, typeof posts>())
+          .entries()
+      )
+        .map(([label, groupPosts]) => {
+          const sortedPosts = groupPosts.sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime())
+          const latestPost = sortedPosts[0]
+          const oldestPost = sortedPosts[sortedPosts.length - 1]
+          const meta = getSeriesDirectoryMeta(label)
+
+          return {
+            label,
+            meta,
+            posts: sortedPosts,
+            latestPost,
+            oldestPost,
+            yearLabel:
+              latestPost.data.pubDate.getFullYear() === oldestPost.data.pubDate.getFullYear()
+                ? String(latestPost.data.pubDate.getFullYear())
+                : `${oldestPost.data.pubDate.getFullYear()}-${latestPost.data.pubDate.getFullYear()}`,
+          }
+        })
+        .sort((a, b) => b.latestPost.data.pubDate.getTime() - a.latestPost.data.pubDate.getTime())
+    : []
+
 ---
 
 <BaseLayout
@@ -65,7 +100,7 @@ const reviewColumns =
 
   <section class="section section-muted archive-section-band">
     <div class="shell archive-section">
-    {posts.length > 0 && <div class="archive-controls">
+    {posts.length > 0 && category.slug !== 'series' && <div class="archive-controls">
       {category.slug === 'review' && (
         <div class="archive-dropdown" data-dropdown>
           <button type="button" class="archive-pill-button" data-dropdown-trigger data-filter-kind-trigger>
@@ -230,8 +265,90 @@ const reviewColumns =
       </div>
     )}
 
-    {posts.length > 0 && (category.slug === 'series' || category.slug === 'tech') && (
-      <div class:list={['post-grid', category.slug === 'series' && 'is-series']} data-filter-list>
+    {posts.length > 0 && category.slug === 'series' && (
+      <div class="series-view-switch" aria-label="연재 보기 방식">
+        <a
+          class="series-view-link is-active"
+          href="/blog/category/series/"
+          aria-current="page"
+          data-analytics-event="select_series_view"
+          data-analytics-payload={JSON.stringify({
+            view_type: 'series_group',
+            destination_url: '/blog/category/series/',
+            source_area: 'series_category',
+          })}
+        >
+          시리즈별
+        </a>
+        <a
+          class="series-view-link"
+          href="/blog/category/series/all/"
+          data-analytics-event="select_series_view"
+          data-analytics-payload={JSON.stringify({
+            view_type: 'all_posts',
+            destination_url: '/blog/category/series/all/',
+            source_area: 'series_category',
+          })}
+        >
+          전체 글
+        </a>
+      </div>
+    )}
+
+    {posts.length > 0 && category.slug === 'series' && (
+      <div class="series-hub-grid">
+        {seriesGroups.map((group) => (
+          <article class="series-hub-card">
+            <a
+              class="series-hub-cover"
+              href={`/blog/series/${group.meta.slug}/`}
+              data-analytics-event="select_series_group"
+              data-analytics-payload={JSON.stringify({
+                series_label: group.label,
+                episode_count: String(group.posts.length),
+                destination_url: `/blog/series/${group.meta.slug}/`,
+                source_area: 'series_category',
+              })}
+            >
+              {group.latestPost.data.coverImage && <img src={group.latestPost.data.coverImage} alt="" loading="lazy" />}
+            </a>
+            <div class="series-hub-body">
+              <div class="series-hub-kicker">
+                <span>{group.meta.eyebrow}</span>
+                <span>{group.posts.length}편</span>
+              </div>
+              <a
+                class="series-hub-title"
+                href={`/blog/series/${group.meta.slug}/`}
+                data-analytics-event="select_series_group"
+                data-analytics-payload={JSON.stringify({
+                  series_label: group.label,
+                  episode_count: String(group.posts.length),
+                  destination_url: `/blog/series/${group.meta.slug}/`,
+                  source_area: 'series_category',
+                })}
+              >
+                <h2>{group.label}</h2>
+              </a>
+              <p>{group.meta.description}</p>
+              <div class="series-hub-latest">
+                <span>최신 편</span>
+                <a href={`/blog/${group.latestPost.slug}/`}>
+                  {group.latestPost.data.seriesMeta?.issueLabel ?? group.latestPost.data.title}
+                </a>
+              </div>
+              <div class="series-hub-foot">
+                <span>{group.yearLabel}</span>
+                <a href={`/blog/series/${group.meta.slug}/`}>시리즈 보기</a>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    )}
+
+    {posts.length > 0 && category.slug === 'tech' && (
+      <div class="post-grid" data-filter-list>
         {posts.map((post) => (
           <div
             data-filter-item

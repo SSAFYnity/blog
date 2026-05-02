@@ -1,0 +1,310 @@
+---
+import { getCollection } from 'astro:content'
+import BaseLayout from '../../../layouts/BaseLayout.astro'
+import PostCard from '../../../components/PostCard.astro'
+import { archiveFilterLabels, archiveYearOptions } from '../../../data/archive'
+import { getSeriesDirectoryMeta } from '../../../data/series'
+import { buildArchiveSearchText } from '../../../lib/archive'
+import { isPublicPost } from '../../../lib/content'
+
+const posts = (await getCollection('posts'))
+  .filter((post) => isPublicPost(post) && post.data.category === 'series')
+  .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime())
+
+const seriesOptions = Array.from(
+  new Set(posts.map((post) => post.data.seriesMeta?.label ?? post.data.title))
+).sort((a, b) => a.localeCompare(b, 'ko-KR'))
+
+const getPostSeriesLabel = (post: (typeof posts)[number]) => post.data.seriesMeta?.label ?? post.data.title
+const getPostSeriesHref = (post: (typeof posts)[number]) =>
+  `/blog/series/${getSeriesDirectoryMeta(getPostSeriesLabel(post)).slug}/`
+---
+
+<BaseLayout
+  title="전체 연재글 | SSAFYnity 블로그"
+  description="SSAFYnity 블로그의 모든 연재글을 최신순으로 모아보는 페이지"
+  analyticsEvent={{
+    name: 'view_series_archive',
+    params: {
+      view_type: 'all_posts',
+    },
+  }}
+>
+  <section class="archive-hero-band archive-hero-band-category">
+    <div class="archive-hero archive-hero-category shell">
+      <p class="eyebrow">Series Archive</p>
+      <h1>전체 연재글</h1>
+      <p class="archive-copy">월간지, 릴스, 기획 콘텐츠를 최신순으로 모아봅니다.</p>
+    </div>
+  </section>
+
+  <section class="section section-muted archive-section-band">
+    <div class="shell archive-section">
+      <div class="series-view-switch" aria-label="연재 보기 방식">
+        <a
+          class="series-view-link"
+          href="/blog/category/series/"
+          data-analytics-event="select_series_view"
+          data-analytics-payload={JSON.stringify({
+            view_type: 'series_group',
+            destination_url: '/blog/category/series/',
+            source_area: 'series_all',
+          })}
+        >
+          시리즈별
+        </a>
+        <a
+          class="series-view-link is-active"
+          href="/blog/category/series/all/"
+          aria-current="page"
+          data-analytics-event="select_series_view"
+          data-analytics-payload={JSON.stringify({
+            view_type: 'all_posts',
+            destination_url: '/blog/category/series/all/',
+            source_area: 'series_all',
+          })}
+        >
+          전체 글
+        </a>
+      </div>
+
+      <div class="archive-controls">
+        <div class="archive-dropdown" data-dropdown>
+          <button type="button" class="archive-pill-button" data-dropdown-trigger data-filter-series-trigger>
+            시리즈
+          </button>
+          <div class="archive-dropdown-menu" data-dropdown-menu hidden>
+            <button type="button" class="archive-dropdown-option is-selected" data-filter-series-option data-value="">
+              전체 시리즈
+            </button>
+            {seriesOptions.map((seriesLabel) => (
+              <button type="button" class="archive-dropdown-option" data-filter-series-option data-value={seriesLabel}>
+                {seriesLabel}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div class="archive-dropdown" data-dropdown>
+          <button type="button" class="archive-pill-button" data-dropdown-trigger data-filter-year-trigger>
+            {archiveFilterLabels.year}
+          </button>
+          <div class="archive-dropdown-menu" data-dropdown-menu hidden>
+            <button type="button" class="archive-dropdown-option is-selected" data-filter-year-option data-value="">
+              {archiveFilterLabels.allYears}
+            </button>
+            {archiveYearOptions.map((year) => (
+              <button type="button" class="archive-dropdown-option" data-filter-year-option data-value={year.value}>
+                {year.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div class="archive-search">
+          <input
+            type="search"
+            placeholder="전체 연재글 안에서 찾기"
+            data-filter-search
+            aria-label="전체 연재글 검색"
+          />
+          <button type="button" class="archive-search-button" data-filter-submit>
+            {archiveFilterLabels.searchButton}
+          </button>
+        </div>
+
+        <div class="archive-dropdown" data-dropdown>
+          <button type="button" class="archive-pill-button" data-dropdown-trigger data-filter-sort-trigger>
+            {archiveFilterLabels.newest}
+          </button>
+          <div class="archive-dropdown-menu" data-dropdown-menu hidden>
+            <button type="button" class="archive-dropdown-option is-selected" data-filter-sort-option data-value="newest">
+              {archiveFilterLabels.newest}
+            </button>
+            <button type="button" class="archive-dropdown-option" data-filter-sort-option data-value="oldest">
+              {archiveFilterLabels.oldest}
+            </button>
+          </div>
+        </div>
+
+        <button type="button" class="archive-reset" data-filter-reset hidden>
+          {archiveFilterLabels.reset}
+        </button>
+      </div>
+
+      <div class="post-grid is-series" data-filter-list>
+        {posts.map((post) => (
+          <div
+            data-filter-item
+            data-date={post.data.pubDate.toISOString()}
+            data-year={String(post.data.pubDate.getFullYear())}
+            data-series={post.data.seriesMeta?.label ?? post.data.title}
+            data-tags={post.data.tags.join('|')}
+            data-search={buildArchiveSearchText(post)}
+          >
+            <PostCard
+              href={`/blog/${post.slug}/`}
+              slug={post.slug}
+              title={post.data.title}
+              description={post.data.description}
+              pubDate={post.data.pubDate}
+              category={post.data.category}
+              coverImage={post.data.coverImage}
+              tags={post.data.tags}
+              seriesLabel={post.data.seriesMeta?.label}
+              seriesHref={getPostSeriesHref(post)}
+              issueLabel={post.data.seriesMeta?.issueLabel}
+              hideCategory
+              variant="series"
+            />
+          </div>
+        ))}
+      </div>
+
+      <div class="archive-empty-state is-filter-empty" data-filter-empty hidden>
+        <strong>{archiveFilterLabels.filteredEmptyTitle}</strong>
+        <p>{archiveFilterLabels.filteredEmptyDescription}</p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script is:inline>
+  const filterList = document.querySelector('[data-filter-list]')
+  const searchInput = document.querySelector('[data-filter-search]')
+  const searchSubmit = document.querySelector('[data-filter-submit]')
+  const seriesTrigger = document.querySelector('[data-filter-series-trigger]')
+  const yearTrigger = document.querySelector('[data-filter-year-trigger]')
+  const sortTrigger = document.querySelector('[data-filter-sort-trigger]')
+  const seriesOptions = [...document.querySelectorAll('[data-filter-series-option]')]
+  const yearOptions = [...document.querySelectorAll('[data-filter-year-option]')]
+  const sortOptions = [...document.querySelectorAll('[data-filter-sort-option]')]
+  const resetButton = document.querySelector('[data-filter-reset]')
+  const emptyState = document.querySelector('[data-filter-empty]')
+
+  if (
+    filterList instanceof HTMLElement &&
+    searchInput instanceof HTMLInputElement &&
+    searchSubmit instanceof HTMLButtonElement &&
+    seriesTrigger instanceof HTMLButtonElement &&
+    yearTrigger instanceof HTMLButtonElement &&
+    sortTrigger instanceof HTMLButtonElement &&
+    resetButton instanceof HTMLButtonElement
+  ) {
+    const items = [...filterList.querySelectorAll('[data-filter-item]')]
+    let activeQuery = ''
+    let activeSeries = ''
+    let activeYear = ''
+    let activeSort = 'newest'
+
+    const applyFilters = () => {
+      const sorted = [...items].sort((a, b) => {
+        const aDate = Date.parse(a.getAttribute('data-date') ?? '')
+        const bDate = Date.parse(b.getAttribute('data-date') ?? '')
+        return activeSort === 'oldest' ? aDate - bDate : bDate - aDate
+      })
+
+      sorted.forEach((item) => {
+        const haystack = (item.getAttribute('data-search') ?? '').toLowerCase()
+        const seriesValue = item.getAttribute('data-series') ?? ''
+        const yearValue = item.getAttribute('data-year') ?? ''
+        const visible =
+          (!activeQuery || haystack.includes(activeQuery)) &&
+          (!activeSeries || seriesValue === activeSeries) &&
+          (!activeYear || yearValue === activeYear)
+
+        item.toggleAttribute('hidden', !visible)
+        filterList.appendChild(item)
+      })
+
+      if (emptyState instanceof HTMLElement) {
+        emptyState.hidden = items.some((item) => !item.hasAttribute('hidden'))
+      }
+
+      resetButton.hidden = !(activeQuery || activeSeries || activeYear || activeSort !== 'newest')
+    }
+
+    const closeDropdowns = () => {
+      document.querySelectorAll('[data-dropdown-menu]').forEach((menu) => {
+        if (menu instanceof HTMLElement) menu.hidden = true
+      })
+    }
+
+    document.querySelectorAll('[data-dropdown]').forEach((dropdown) => {
+      const trigger = dropdown.querySelector('[data-dropdown-trigger]')
+      const menu = dropdown.querySelector('[data-dropdown-menu]')
+      if (!(trigger instanceof HTMLButtonElement) || !(menu instanceof HTMLElement)) return
+
+      trigger.addEventListener('click', () => {
+        const nextHidden = !menu.hidden
+        closeDropdowns()
+        menu.hidden = nextHidden
+      })
+    })
+
+    document.addEventListener('click', (event) => {
+      const target = event.target
+      if (!(target instanceof Element) || !target.closest('[data-dropdown]')) closeDropdowns()
+    })
+
+    const submitSearch = () => {
+      activeQuery = searchInput.value.trim().toLowerCase()
+      applyFilters()
+    }
+
+    searchSubmit.addEventListener('click', submitSearch)
+    searchInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') submitSearch()
+    })
+
+    seriesOptions.forEach((option) => {
+      if (!(option instanceof HTMLButtonElement)) return
+      option.addEventListener('click', () => {
+        activeSeries = option.dataset.value ?? ''
+        seriesTrigger.textContent = activeSeries ? option.textContent?.trim() ?? '시리즈' : '시리즈'
+        seriesOptions.forEach((candidate) => candidate.classList.toggle('is-selected', candidate === option))
+        closeDropdowns()
+        applyFilters()
+      })
+    })
+
+    yearOptions.forEach((option) => {
+      if (!(option instanceof HTMLButtonElement)) return
+      option.addEventListener('click', () => {
+        activeYear = option.dataset.value ?? ''
+        yearTrigger.textContent = activeYear ? option.textContent?.trim() ?? '연도' : '연도'
+        yearOptions.forEach((candidate) => candidate.classList.toggle('is-selected', candidate === option))
+        closeDropdowns()
+        applyFilters()
+      })
+    })
+
+    sortOptions.forEach((option) => {
+      if (!(option instanceof HTMLButtonElement)) return
+      option.addEventListener('click', () => {
+        activeSort = option.dataset.value ?? 'newest'
+        sortTrigger.textContent = option.textContent?.trim() ?? '정렬'
+        sortOptions.forEach((candidate) => candidate.classList.toggle('is-selected', candidate === option))
+        closeDropdowns()
+        applyFilters()
+      })
+    })
+
+    resetButton.addEventListener('click', () => {
+      activeQuery = ''
+      activeSeries = ''
+      activeYear = ''
+      activeSort = 'newest'
+      searchInput.value = ''
+      seriesTrigger.textContent = '시리즈'
+      yearTrigger.textContent = '연도'
+      sortTrigger.textContent = '최신순'
+      seriesOptions.forEach((option) => option.classList.toggle('is-selected', (option.dataset.value ?? '') === ''))
+      yearOptions.forEach((option) => option.classList.toggle('is-selected', (option.dataset.value ?? '') === ''))
+      sortOptions.forEach((option) => option.classList.toggle('is-selected', option.dataset.value === 'newest'))
+      applyFilters()
+    })
+
+    applyFilters()
+  }
+</script>

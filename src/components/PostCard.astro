@@ -11,6 +11,9 @@ interface Props {
   coverImage?: string
   tags?: string[]
   metaLabel?: string
+  seriesLabel?: string
+  seriesHref?: string
+  issueLabel?: string
   hideCategory?: boolean
   variant?: 'default' | 'series'
 }
@@ -25,6 +28,9 @@ const {
   coverImage,
   tags = [],
   metaLabel,
+  seriesLabel,
+  seriesHref,
+  issueLabel,
   hideCategory = false,
   variant = 'default',
 } = Astro.props
@@ -42,6 +48,14 @@ const analyticsPayload = JSON.stringify({
   destination_url: href,
   source_area: 'post_card',
 })
+
+const seriesAnalyticsPayload = seriesHref
+  ? JSON.stringify({
+      series_label: seriesLabel,
+      destination_url: seriesHref,
+      source_area: 'post_card_badge',
+    })
+  : undefined
 ---
 
 <article class:list={['post-card', variant === 'series' && 'post-card-series']}>
@@ -59,13 +73,30 @@ const analyticsPayload = JSON.stringify({
 
   {variant === 'series' ? (
     <>
+      <div class="series-card-meta-row">
+        {seriesLabel && seriesHref ? (
+          <a
+            class="series-card-badge"
+            href={seriesHref}
+            aria-label={`${seriesLabel} 시리즈 보기`}
+            data-analytics-event="select_series_group"
+            data-analytics-payload={seriesAnalyticsPayload}
+          >
+            {seriesLabel}
+          </a>
+        ) : (
+          seriesLabel && <span class="series-card-badge">{seriesLabel}</span>
+        )}
+        <time datetime={pubDate.toISOString()}>{dateLabel}</time>
+      </div>
+
       <a
         class="post-card-link"
         href={href}
         data-analytics-event="select_blog_post"
         data-analytics-payload={analyticsPayload}
       >
-        <h3>{title}</h3>
+        <h3>{issueLabel ?? title}</h3>
       </a>
 
       <div class="series-card-foot">
@@ -76,7 +107,6 @@ const analyticsPayload = JSON.stringify({
             ))}
           </ul>
         )}
-        <time datetime={pubDate.toISOString()}>{dateLabel}</time>
       </div>
     </>
   ) : (

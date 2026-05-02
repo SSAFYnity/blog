@@ -1,5 +1,6 @@
 import { getCollection } from 'astro:content'
 import { site } from '../data/site'
+import { getSeriesDirectoryMeta } from '../data/series'
 import { isPublicPost } from '../lib/content'
 
 export const prerender = true
@@ -25,11 +26,24 @@ export async function GET() {
     .filter(isPublicPost)
     .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime())
 
+  const seriesPages = Array.from(
+    new Set(
+      posts
+        .filter((post) => post.data.category === 'series')
+        .map((post) => getSeriesDirectoryMeta(post.data.seriesMeta?.label ?? post.data.title).slug)
+    )
+  )
+
   const staticEntries = [
     { loc: normalizeUrl('/'), lastmod: undefined },
     { loc: normalizeUrl('/posts/'), lastmod: undefined },
     ...site.categories.map((category) => ({
       loc: normalizeUrl(`/category/${category.slug}/`),
+      lastmod: undefined,
+    })),
+    { loc: normalizeUrl('/category/series/all/'), lastmod: undefined },
+    ...seriesPages.map((seriesSlug) => ({
+      loc: normalizeUrl(`/series/${seriesSlug}/`),
       lastmod: undefined,
     })),
   ]

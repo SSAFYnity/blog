@@ -4,6 +4,7 @@ import BaseLayout from '../layouts/BaseLayout.astro'
 import { categoryStyles, getCategoryTitle } from '../data/site'
 import { eventArchiveMap, getEventArchiveUrl } from '../data/eventArchive'
 import { publicOperatorProfileMap } from '../data/operatorProfiles'
+import { getSeriesDirectoryMeta } from '../data/series'
 import { getPostEventSlug } from '../lib/archive'
 import { isPublicPost } from '../lib/content'
 
@@ -42,6 +43,10 @@ const seriesMetaLabel =
         .filter(Boolean)
         .join(' · ')
     : null
+const seriesBackLabel = post.data.category === 'series' ? post.data.seriesMeta?.label : null
+const seriesBackHref = seriesBackLabel
+  ? `/blog/series/${getSeriesDirectoryMeta(seriesBackLabel).slug}/`
+  : null
 ---
 
 <BaseLayout
@@ -59,11 +64,40 @@ const seriesMetaLabel =
   }}
 >
   <section class="post-detail-shell">
+    {seriesBackHref && seriesBackLabel && (
+      <nav class:list={['post-parent-nav shell', hasAside && 'has-aside']} aria-label="상위 시리즈">
+        <a
+          class="post-parent-link"
+          href={seriesBackHref}
+          data-analytics-event="select_series_back_link"
+          data-analytics-params={JSON.stringify({
+            post_slug: post.slug,
+            series_label: seriesBackLabel,
+          })}
+        >
+          <span aria-hidden="true">←</span>
+          {seriesBackLabel}으로 돌아가기
+        </a>
+      </nav>
+    )}
+
     <div class:list={['post-detail-frame shell', hasAside && 'has-aside']}>
       <header class:list={['post-detail-header', post.data.category === 'journal' && 'is-journal']}>
         <div class="post-detail-header-copy">
           <div class="post-meta-row">
-            {post.data.category !== 'journal' && (
+            {seriesBackHref && seriesBackLabel ? (
+              <a
+                class="pill is-series"
+                href={seriesBackHref}
+                data-analytics-event="select_series_badge"
+                data-analytics-params={JSON.stringify({
+                  post_slug: post.slug,
+                  series_label: seriesBackLabel,
+                })}
+              >
+                {seriesBackLabel}
+              </a>
+            ) : post.data.category !== 'journal' && (
               <span class:list={['pill', categoryStyles[post.data.category] ?? 'is-slate']}>
                 {getCategoryTitle(post.data.category)}
               </span>
