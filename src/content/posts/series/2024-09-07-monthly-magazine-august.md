@@ -11,7 +11,7 @@ tags:
 seriesMeta:
   season: "3기 운영진"
   team: "콘텐츠팀"
-  label: "2024 SSAFYnity 월간지"
+  label: "월간 SSAFYnity"
   issueLabel: "8월호"
 ---
 
