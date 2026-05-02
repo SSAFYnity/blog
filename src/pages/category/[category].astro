@@ -92,9 +92,21 @@ const seriesGroups =
 >
   <section class="archive-hero-band archive-hero-band-category">
     <div class="archive-hero archive-hero-category shell">
-      <p class="eyebrow">Category</p>
-      <h1>{categoryInfo.title}</h1>
-      <p class="archive-copy">{categoryInfo.description}</p>
+      <div>
+        <p class="eyebrow">Category</p>
+        <h1>{categoryInfo.title}</h1>
+        <p class="archive-copy">{categoryInfo.description}</p>
+      </div>
+      {category.slug === 'review' && (
+        <a
+          class="archive-hero-link"
+          href="https://forms.gle/tM69YrDGWeYRDE8UA"
+          target="_blank"
+          rel="noreferrer"
+        >
+          후기 제출하기
+        </a>
+      )}
     </div>
   </section>
 
