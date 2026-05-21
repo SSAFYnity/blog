@@ -1,4 +1,5 @@
 import { defineCollection, z } from 'astro:content'
+import { clubArchiveSlugs } from './data/clubs'
 import { eventArchiveSlugs } from './data/eventArchive'
 
 const posts = defineCollection({
@@ -7,9 +8,10 @@ const posts = defineCollection({
       title: z.string(),
       description: z.string(),
       pubDate: z.coerce.date(),
-      category: z.enum(['series', 'tech', 'journal', 'review', 'notice', 'finance']),
+      category: z.enum(['series', 'tech', 'journal', 'club', 'review', 'notice', 'finance']),
       coverImage: z.string().optional(),
       eventSlug: z.enum(eventArchiveSlugs).optional(),
+      clubSlug: z.enum(clubArchiveSlugs).optional(),
       author: z
         .object({
           operatorId: z.string().regex(/^operator-\d{3}$/),
@@ -43,6 +45,14 @@ const posts = defineCollection({
           code: z.ZodIssueCode.custom,
           path: ['author', 'operatorId'],
           message: 'journal 글에는 author.operatorId가 필요합니다.',
+        })
+      }
+
+      if (value.category === 'club' && !value.clubSlug) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['clubSlug'],
+          message: 'club 글에는 clubSlug가 필요합니다.',
         })
       }
 

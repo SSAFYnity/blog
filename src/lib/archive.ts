@@ -1,5 +1,6 @@
 import type { CollectionEntry } from 'astro:content'
 
+import { clubArchiveMap } from '../data/clubs'
 import { eventArchiveMap } from '../data/eventArchive'
 import { publicOperatorProfileMap } from '../data/operatorProfiles'
 
@@ -21,6 +22,17 @@ function resolveReviewAuthor(review?: ReviewMeta) {
 
 export function getPostEventSlug(post: PostEntry) {
   return post.data.eventSlug ?? post.data.review?.eventSlug ?? null
+}
+
+export function getPostSlugLeaf(post: PostEntry) {
+  return post.slug.split('/').at(-1) ?? post.slug
+}
+
+export function getClubPostOrderLabel(post: PostEntry) {
+  if (post.data.category !== 'club') return null
+
+  const slugLeaf = getPostSlugLeaf(post)
+  return /^\d+$/.test(slugLeaf) ? slugLeaf : null
 }
 
 export function formatArchiveDate(date: Date) {
@@ -55,6 +67,7 @@ export function getReviewAuthorDisplayName(review?: ReviewMeta) {
 
 export function buildArchiveSearchText(post: PostEntry) {
   const eventSlug = getPostEventSlug(post)
+  const clubTitle = post.data.clubSlug ? clubArchiveMap[post.data.clubSlug]?.title : ''
   const resolvedReviewAuthor = resolveReviewAuthor(post.data.review)
   const reviewBits =
     post.data.review?.authorType === 'member'
@@ -73,6 +86,7 @@ export function buildArchiveSearchText(post: PostEntry) {
     post.data.title,
     post.data.description,
     ...post.data.tags,
+    clubTitle,
     eventSlug ? eventArchiveMap[eventSlug]?.title : '',
     ...reviewBits,
     post.body,

@@ -8,7 +8,7 @@ export const site = {
   name: 'SSAFYnity 블로그',
   shortName: 'SSAFYnity',
   title: 'SSAFYnity 블로그',
-  description: '공지, 일지, 연재, 기술, 후기, 회비 기록을 담는 SSAFYnity 공식 블로그',
+  description: '공지, 일지, 동아리, 연재, 기술, 후기, 회비 기록을 담는 SSAFYnity 공식 블로그',
   slogan: '싸피 수료생들이 직접 운영하는 동문회의 공식 블로그',
   baseUrl: 'https://ssafynity.github.io/blog',
   ogImage: 'https://ssafynity.github.io/blog/logo-rect.png',
@@ -63,6 +63,11 @@ export const site = {
       description: '동문회가 운영한 행사의 하루를 전하는 기록',
     },
     {
+      slug: 'club',
+      title: '동아리',
+      description: '각 동아리가 직접 남기는 활동 기록과 아카이브',
+    },
+    {
       slug: 'series',
       title: '연재',
       description: '동문회 안에서 이어지는 시리즈형 콘텐츠와 기획 연재',
@@ -115,6 +120,7 @@ export const categoryMap = Object.fromEntries(
 ) as Record<CategorySlug, Category>
 
 export const categoryStyles: Record<CategorySlug, string> = {
+  club: 'is-violet',
   series: 'is-emerald',
   tech: 'is-blue',
   journal: 'is-sky',
@@ -124,3 +130,40 @@ export const categoryStyles: Record<CategorySlug, string> = {
 }
 
 export const getCategoryTitle = (slug: CategorySlug) => categoryMap[slug].title
+
+export const navGroups = [
+  {
+    type: 'link',
+    label: '공지',
+    href: '/blog/category/notice/',
+    slugs: ['notice'],
+  },
+  {
+    type: 'link',
+    label: '연재',
+    href: '/blog/category/series/',
+    slugs: ['series'],
+  },
+  {
+    type: 'link',
+    label: '기술',
+    href: '/blog/category/tech/',
+    slugs: ['tech'],
+  },
+  {
+    type: 'group',
+    label: '운영',
+    items: [
+      { label: '일지', href: '/blog/category/journal/', slug: 'journal' },
+      { label: '회비', href: '/blog/category/finance/', slug: 'finance' },
+    ],
+  },
+  {
+    type: 'group',
+    label: '참여',
+    items: [
+      { label: '동아리', href: '/blog/category/club/', slug: 'club' },
+      { label: '후기', href: '/blog/category/review/', slug: 'review' },
+    ],
+  },
+] as const
