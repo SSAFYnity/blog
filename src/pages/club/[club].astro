@@ -1,0 +1,122 @@
+---
+import { getCollection } from 'astro:content'
+
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import { clubArchive, clubArchiveMap, getClubArchiveUrl, getClubOfficialUrl } from '../../data/clubs'
+import { formatArchiveDate, getClubPostOrderLabel } from '../../lib/archive'
+import { isPublicPost } from '../../lib/content'
+
+export async function getStaticPaths() {
+  const posts = (await getCollection('posts')).filter(isPublicPost)
+
+  return clubArchive
+    .filter((club) => posts.some((post) => post.data.category === 'club' && post.data.clubSlug === club.slug))
+    .map((club) => ({
+      params: { club: club.slug },
+      props: { club },
+    }))
+}
+
+const { club } = Astro.props
+
+const chronologicalPosts = (await getCollection('posts'))
+  .filter((post) => isPublicPost(post) && post.data.category === 'club' && post.data.clubSlug === club.slug)
+  .sort((a, b) => a.data.pubDate.getTime() - b.data.pubDate.getTime())
+
+const posts = [...chronologicalPosts].reverse()
+
+const latestPost = chronologicalPosts.at(-1) ?? null
+const firstPost = chronologicalPosts[0] ?? null
+const latestOrder = latestPost ? getClubPostOrderLabel(latestPost) : null
+const firstOrder = firstPost ? getClubPostOrderLabel(firstPost) : null
+const clubMeta = clubArchiveMap[club.slug]
+---
+
+<BaseLayout
+  title={`${clubMeta.title} 일지 | SSAFYnity 블로그`}
+  description={`${clubMeta.title} 동아리 활동을 회차별로 모아보는 아카이브입니다.`}
+>
+  <section class="archive-hero-band archive-hero-band-category">
+    <div class="archive-hero archive-hero-category shell">
+      <div class="club-archive-hero-copy">
+        <div class="club-archive-hero-topbar">
+          <a
+            class="archive-hero-link archive-hero-link-back"
+            href="/blog/category/club/"
+            data-analytics-event="select_category_back_link"
+            data-analytics-params={JSON.stringify({
+              source_area: 'club_archive',
+              club_slug: club.slug,
+            })}
+          >
+            &lt; 동아리 목록으로
+          </a>
+        </div>
+        <p class="eyebrow">Club Archive</p>
+        <h1>{clubMeta.title}</h1>
+        <p class="archive-copy">
+          {clubMeta.summary} 기록을 회차별 일지로 정리했습니다.
+          <br />
+          정기 모임과 원정, 합동 행사, MT까지 한 흐름으로 이어서 볼 수 있습니다.
+        </p>
+        <div class="club-archive-hero-bottom">
+          <a
+            class="archive-hero-link archive-hero-link-secondary"
+            href={getClubOfficialUrl(club.slug)}
+            target="_blank"
+            rel="noreferrer"
+            data-analytics-event="select_club_official_page"
+            data-analytics-payload={JSON.stringify({
+              club_slug: club.slug,
+              club_title: clubMeta.title,
+              destination_url: getClubOfficialUrl(club.slug),
+              source_area: 'club_archive',
+            })}
+          >
+            동아리 설명 보기
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-muted archive-section-band">
+    <div class="shell archive-section">
+      <div class="activity-log">
+        {posts.map((post) => {
+          const orderLabel = getClubPostOrderLabel(post) ?? '000'
+          const destinationUrl = `/blog/${post.slug}/`
+
+          return (
+            <a
+              class="activity-card activity-card-journal"
+              href={destinationUrl}
+              data-analytics-event="select_blog_post"
+              data-analytics-payload={JSON.stringify({
+                post_slug: post.slug,
+                post_title: post.data.title,
+                post_category: post.data.category,
+                club_slug: club.slug,
+                destination_url: destinationUrl,
+                source_area: `club_archive_${club.slug}`,
+              })}
+            >
+              <div class="activity-card-head">
+                <h2>{orderLabel}. {post.data.title}</h2>
+                <time datetime={post.data.pubDate.toISOString()}>{formatArchiveDate(post.data.pubDate)}</time>
+              </div>
+              <p>{post.data.description}</p>
+              {post.data.tags.length > 0 && (
+                <ul class="activity-tag-list" aria-label="태그">
+                  {post.data.tags.map((tag) => (
+                    <li>#{tag}</li>
+                  ))}
+                </ul>
+              )}
+            </a>
+          )
+        })}
+      </div>
+    </div>
+  </section>
+</BaseLayout>

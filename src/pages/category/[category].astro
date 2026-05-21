@@ -3,10 +3,11 @@ import { getCollection, render } from 'astro:content'
 import BaseLayout from '../../layouts/BaseLayout.astro'
 import PostCard from '../../components/PostCard.astro'
 import { archiveEmptyMessages, archiveFilterLabels, archiveYearOptions, reviewAudienceLabels } from '../../data/archive'
+import { clubArchiveMap, getClubArchiveUrl, getClubOfficialUrl } from '../../data/clubs'
 import { categoryMap, site } from '../../data/site'
 import { eventArchiveMap, eventKindLabels, getEventArchiveUrl } from '../../data/eventArchive'
 import { getSeriesDirectoryMeta } from '../../data/series'
-import { buildArchiveSearchText, formatArchiveDate, formatReviewAuthor, getPostEventSlug, getReviewAuthorDisplayName } from '../../lib/archive'
+import { buildArchiveSearchText, formatArchiveDate, formatReviewAuthor, getClubPostOrderLabel, getPostEventSlug, getReviewAuthorDisplayName } from '../../lib/archive'
 import { isPublicPost } from '../../lib/content'
 
 export async function getStaticPaths() {
@@ -84,6 +85,38 @@ const seriesGroups =
         .sort((a, b) => b.latestPost.data.pubDate.getTime() - a.latestPost.data.pubDate.getTime())
     : []
 
+const clubGroups =
+  category.slug === 'club'
+    ? Array.from(
+        posts
+          .reduce((groups, post) => {
+            const slug = post.data.clubSlug
+            if (!slug) return groups
+
+            const groupPosts = groups.get(slug) ?? []
+            groupPosts.push(post)
+            groups.set(slug, groupPosts)
+            return groups
+          }, new Map<string, typeof posts>())
+          .entries()
+      )
+        .map(([slug, groupPosts]) => {
+          const sortedPosts = groupPosts.sort((a, b) => a.data.pubDate.getTime() - b.data.pubDate.getTime())
+          const latestPost = sortedPosts[sortedPosts.length - 1]
+          const firstPost = sortedPosts[0]
+          const clubMeta = clubArchiveMap[slug as keyof typeof clubArchiveMap]
+
+          return {
+            slug,
+            meta: clubMeta,
+            posts: sortedPosts,
+            latestPost,
+            firstPost,
+          }
+        })
+        .sort((a, b) => b.latestPost.data.pubDate.getTime() - a.latestPost.data.pubDate.getTime())
+    : []
+
 ---
 
 <BaseLayout
@@ -112,7 +145,7 @@ const seriesGroups =
 
   <section class="section section-muted archive-section-band">
     <div class="shell archive-section">
-    {posts.length > 0 && category.slug !== 'series' && <div class="archive-controls">
+    {posts.length > 0 && category.slug !== 'series' && category.slug !== 'club' && <div class="archive-controls">
       {category.slug === 'review' && (
         <div class="archive-dropdown" data-dropdown>
           <button type="button" class="archive-pill-button" data-dropdown-trigger data-filter-kind-trigger>
@@ -249,7 +282,7 @@ const seriesGroups =
               post_title: post.data.title,
               post_category: post.data.category,
               destination_url: `/blog/${post.slug}/`,
-              source_area: 'category_journal',
+              source_area: `category_${category.slug}`,
             })}
             data-filter-item
             data-date={post.data.pubDate.toISOString()}
@@ -270,6 +303,78 @@ const seriesGroups =
               </ul>
             )}
           </a>
+        ))}
+      </div>
+    )}
+
+    {posts.length > 0 && category.slug === 'club' && (
+      <div class="club-hub-grid">
+        {clubGroups.map((group) => (
+          <article class="club-directory-card">
+            <a
+              class="club-directory-main"
+              href={getClubArchiveUrl(group.slug as keyof typeof clubArchiveMap)}
+              data-analytics-event="select_club_archive"
+              data-analytics-payload={JSON.stringify({
+                club_slug: group.slug,
+                club_title: group.meta?.title ?? group.slug,
+                post_count: String(group.posts.length),
+                destination_url: getClubArchiveUrl(group.slug as keyof typeof clubArchiveMap),
+                source_area: 'category_club',
+              })}
+            >
+              <div class="club-directory-head">
+                <div>
+                  <p class="club-directory-kicker">{group.slug}</p>
+                  <h2>{group.meta?.title ?? group.slug}</h2>
+                </div>
+                <span class="club-directory-count">{group.posts.length}편</span>
+              </div>
+
+              <p class="club-directory-summary">
+                {group.meta?.summary ?? '동아리 활동 기록을 회차별 일지로 모아볼 수 있습니다.'}
+              </p>
+
+              <div class="club-directory-latest">
+                <span>최신 기록</span>
+                <b>{getClubPostOrderLabel(group.latestPost) ?? String(group.posts.length).padStart(3, '0')}. {group.latestPost.data.title}</b>
+                <time datetime={group.latestPost.data.pubDate.toISOString()}>
+                  {formatArchiveDate(group.latestPost.data.pubDate)}
+                </time>
+              </div>
+            </a>
+
+            <div class="club-directory-actions">
+              <a
+                class="club-directory-action"
+                href={getClubArchiveUrl(group.slug as keyof typeof clubArchiveMap)}
+                data-analytics-event="select_club_archive"
+                data-analytics-payload={JSON.stringify({
+                  club_slug: group.slug,
+                  club_title: group.meta?.title ?? group.slug,
+                  destination_url: getClubArchiveUrl(group.slug as keyof typeof clubArchiveMap),
+                  source_area: 'category_club_action',
+                })}
+              >
+                일지 보기
+              </a>
+              <a
+                class="club-directory-action is-secondary"
+                href={getClubOfficialUrl(group.slug as keyof typeof clubArchiveMap)}
+                target="_blank"
+                rel="noreferrer"
+                data-analytics-event="select_club_official_page"
+                data-analytics-payload={JSON.stringify({
+                  club_slug: group.slug,
+                  club_title: group.meta?.title ?? group.slug,
+                  destination_url: getClubOfficialUrl(group.slug as keyof typeof clubArchiveMap),
+                  source_area: 'category_club_action',
+                })}
+              >
+                공식 소개
+              </a>
+            </div>
+          </article>
         ))}
       </div>
     )}

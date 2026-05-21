@@ -1,20 +1,11 @@
 ---
-import { site } from '../data/site'
+import { navGroups, site, type CategorySlug } from '../data/site'
 
 const currentPath = Astro.url.pathname
 const normalizedPath = currentPath.endsWith('/') ? currentPath : `${currentPath}/`
 const isHomePath = normalizedPath === '/blog/' || normalizedPath === '/'
-
-const navItems = [
-  ...site.categories.map((category) => ({
-    label: category.title,
-    href: `/blog/category/${category.slug}/`,
-  })),
-]
-
-const isActive = (href: string) => {
-  return currentPath.startsWith(href)
-}
+const isHrefActive = (href: string) => normalizedPath.startsWith(href)
+const isSlugActive = (slug: CategorySlug) => normalizedPath.startsWith(`/blog/category/${slug}/`)
 ---
 
 <header
@@ -31,16 +22,41 @@ const isActive = (href: string) => {
     </a>
 
     <nav class="nav" aria-label="블로그 주요 메뉴">
-      {navItems.map((item) => (
-        <a
-          class:list={['nav-link', { 'is-active': isActive(item.href) }]}
-          href={item.href}
-          target={item.href.startsWith('http') ? '_blank' : undefined}
-          rel={item.href.startsWith('http') ? 'noreferrer' : undefined}
-        >
-          {item.label}
-        </a>
-      ))}
+      {navGroups.map((item, index) =>
+        item.type === 'link' ? (
+          <a
+            class:list={['nav-link', { 'is-active': item.slugs.some((slug) => isSlugActive(slug)) }]}
+            href={item.href}
+          >
+            {item.label}
+          </a>
+        ) : (
+          <div class:list={['nav-group', { 'is-active': item.items.some((child) => isSlugActive(child.slug)) }]} data-nav-group>
+            <button
+              class="nav-group-trigger"
+              type="button"
+              aria-expanded="false"
+              aria-controls={`nav-group-panel-${index}`}
+              data-nav-group-trigger
+            >
+              <span>{item.label}</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m6.75 9 5.25 5.25L17.25 9"></path>
+              </svg>
+            </button>
+            <div class="nav-group-menu" id={`nav-group-panel-${index}`} data-nav-group-menu hidden>
+              {item.items.map((child) => (
+                <a
+                  class:list={['nav-group-link', { 'is-active': isSlugActive(child.slug) }]}
+                  href={child.href}
+                >
+                  {child.label}
+                </a>
+              ))}
+            </div>
+          </div>
+        ),
+      )}
     </nav>
 
     <button
@@ -76,18 +92,33 @@ const isActive = (href: string) => {
         </svg>
       </button>
       <div class="mobile-nav-group">
-        <p class="mobile-nav-title">블로그</p>
         <nav class="mobile-nav-links" aria-label="모바일 블로그 메뉴">
-          {navItems.map((item) => (
-            <a
-              class:list={['mobile-nav-link', { 'is-active': isActive(item.href) }]}
-              href={item.href}
-              target={item.href.startsWith('http') ? '_blank' : undefined}
-              rel={item.href.startsWith('http') ? 'noreferrer' : undefined}
-            >
-              <span>{item.label}</span>
-            </a>
-          ))}
+          {navGroups.map((item) =>
+            item.type === 'link' ? (
+              <div class="mobile-nav-section">
+                <a
+                  class:list={['mobile-nav-section-link', { 'is-active': item.slugs.some((slug) => isSlugActive(slug)) }]}
+                  href={item.href}
+                >
+                  {item.label}
+                </a>
+              </div>
+            ) : (
+              <div class="mobile-nav-section">
+                <p class="mobile-nav-title">{item.label}</p>
+                <div class="mobile-nav-group-links">
+                  {item.items.map((child) => (
+                    <a
+                      class:list={['mobile-nav-link', 'is-child', { 'is-active': isSlugActive(child.slug) }]}
+                      href={child.href}
+                    >
+                      <span>{child.label}</span>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            ),
+          )}
         </nav>
       </div>
     </div>
@@ -101,6 +132,30 @@ const isActive = (href: string) => {
   const menuDrawer = header?.querySelector<HTMLElement>('[data-mobile-nav-drawer]')
   const menuBackdrop = header?.querySelector<HTMLElement>('[data-mobile-nav-backdrop]')
   const menuLinks = menuDrawer?.querySelectorAll<HTMLAnchorElement>('a') ?? []
+  const desktopGroups = header?.querySelectorAll<HTMLElement>('[data-nav-group]') ?? []
+
+  const openDesktopGroup = (group: HTMLElement) => {
+    const trigger = group.querySelector<HTMLButtonElement>('[data-nav-group-trigger]')
+    const menu = group.querySelector<HTMLElement>('[data-nav-group-menu]')
+    if (!trigger || !menu) return
+
+    closeDesktopGroups()
+    group.classList.add('is-open')
+    trigger.setAttribute('aria-expanded', 'true')
+    menu.hidden = false
+  }
+
+  const closeDesktopGroups = () => {
+    desktopGroups.forEach((group) => {
+      const trigger = group.querySelector<HTMLButtonElement>('[data-nav-group-trigger]')
+      const menu = group.querySelector<HTMLElement>('[data-nav-group-menu]')
+      group.classList.remove('is-open')
+      trigger?.setAttribute('aria-expanded', 'false')
+      if (menu) {
+        menu.hidden = true
+      }
+    })
+  }
 
   const closeMobileMenu = () => {
     if (!header || !menuToggle || !menuDrawer || !menuBackdrop) return
@@ -143,12 +198,36 @@ const isActive = (href: string) => {
   menuBackdrop?.addEventListener('click', closeMobileMenu)
   menuClose?.addEventListener('click', closeMobileMenu)
 
+  desktopGroups.forEach((group) => {
+    const trigger = group.querySelector<HTMLButtonElement>('[data-nav-group-trigger]')
+    const menu = group.querySelector<HTMLElement>('[data-nav-group-menu]')
+
+    if (!trigger || !menu) return
+
+    group.addEventListener('mouseenter', () => {
+      if (window.innerWidth < 1024) return
+      openDesktopGroup(group)
+    })
+
+    group.addEventListener('mouseleave', () => {
+      if (window.innerWidth < 1024) return
+      closeDesktopGroups()
+    })
+  })
+
   menuLinks.forEach((link) => {
     link.addEventListener('click', closeMobileMenu)
   })
 
+  document.addEventListener('click', (event) => {
+    if (!(event.target instanceof Node) || !header) return
+    if (header.contains(event.target)) return
+    closeDesktopGroups()
+  })
+
   window.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
+      closeDesktopGroups()
       closeMobileMenu()
     }
   })
