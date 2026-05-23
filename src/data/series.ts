@@ -4,6 +4,11 @@ export const seriesDirectory = {
     description: '콘텐츠팀이 매월 전하는 동문회 소식과 커뮤니티 하이라이트입니다.',
     eyebrow: 'Monthly Magazine',
   },
+  '동문회 소식 뉴스카드': {
+    slug: 'alumni-news-cards',
+    description: '동문회 운영 소식과 커뮤니티 업데이트를 카드형 브리프로 빠르게 전하는 연재입니다.',
+    eyebrow: 'News Cards',
+  },
   '개발자라면 공감하는 순간': {
     slug: 'developer-empathy',
     description: '개발자의 웃픈 순간을 짧은 영상과 가벼운 글로 풀어내는 공감형 콘텐츠입니다.',
