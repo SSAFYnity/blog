@@ -72,13 +72,13 @@ const parentBackAnalyticsParams = seriesBackHref
 const explicitDescription = post.data.description.trim()
 const seoDescription = explicitDescription || (
   post.data.category === 'journal' && eventArchiveTitle
-    ? `${eventArchiveTitle} 행사 기록을 담은 SSAFYnity 공식 블로그 글입니다.`
-    : `${post.data.title}에 대한 ${getCategoryTitle(post.data.category)} 카테고리의 SSAFYnity 공식 블로그 글입니다.`
+    ? `${eventArchiveTitle} 행사 기록을 담은 싸피니티(SSAFYnity) 공식 블로그 글입니다.`
+    : `${post.data.title}에 대한 ${getCategoryTitle(post.data.category)} 카테고리의 싸피니티(SSAFYnity) 공식 블로그 글입니다.`
 )
 ---
 
 <BaseLayout
-  title={`${post.data.title} | SSAFYnity 블로그`}
+  title={`${post.data.title} | 싸피니티 SSAFYnity 블로그`}
   description={seoDescription}
   metaType="article"
   analyticsEvent={{

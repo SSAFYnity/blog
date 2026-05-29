@@ -16,7 +16,7 @@ const posts = (await getCollection('posts'))
 const leadPosts = posts.filter((post) => post.data.category !== 'review').slice(0, 6)
 ---
 
-<BaseLayout title={`${site.title} | 공식 콘텐츠 아카이브`} description={site.description}>
+<BaseLayout title={`공식 콘텐츠 아카이브 | ${site.title}`} description={site.description}>
   <HomeHero postsCount={posts.length} categoriesCount={site.categories.length} />
   <HomeCategoryIntro categories={site.categories} />
   <HomeLatestSection posts={leadPosts} />
