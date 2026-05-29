@@ -5,10 +5,13 @@
 // [주의] 이 값은 블로그 Header, Footer, 메타 정보에 함께 반영됩니다.
 // 함께 확인: /Users/hyeona/Dev/SSAFYnity/ssafynity.github.io/src/data/siteData.ts
 export const site = {
-  name: 'SSAFYnity 블로그',
+  brandName: '싸피니티',
+  englishName: 'SSAFYnity',
+  displayName: '싸피니티 SSAFYnity',
+  name: '싸피니티 블로그',
   shortName: 'SSAFYnity',
-  title: 'SSAFYnity 블로그',
-  description: '공지, 일지, 동아리, 연재, 기술, 후기, 회비 기록을 담는 SSAFYnity 공식 블로그',
+  title: '싸피니티 SSAFYnity 블로그',
+  description: '싸피니티(SSAFYnity)의 공지, 일지, 동아리, 연재, 기술, 후기, 회비 기록을 담는 공식 블로그',
   slogan: '싸피 수료생들이 직접 운영하는 동문회의 공식 블로그',
   baseUrl: 'https://ssafynity.github.io/blog',
   ogImage: 'https://ssafynity.github.io/blog/logo-rect.png',
