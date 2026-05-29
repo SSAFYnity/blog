@@ -69,11 +69,17 @@ const parentBackAnalyticsParams = seriesBackHref
         post_slug: post.slug,
         post_category: post.data.category,
       }
+const explicitDescription = post.data.description.trim()
+const seoDescription = explicitDescription || (
+  post.data.category === 'journal' && eventArchiveTitle
+    ? `${eventArchiveTitle} 행사 기록을 담은 SSAFYnity 공식 블로그 글입니다.`
+    : `${post.data.title}에 대한 ${getCategoryTitle(post.data.category)} 카테고리의 SSAFYnity 공식 블로그 글입니다.`
+)
 ---
 
 <BaseLayout
   title={`${post.data.title} | SSAFYnity 블로그`}
-  description={post.data.description}
+  description={seoDescription}
   metaType="article"
   analyticsEvent={{
     name: 'view_blog_post',
@@ -126,7 +132,7 @@ const parentBackAnalyticsParams = seriesBackHref
 
           <h1>{post.data.title}</h1>
           {seriesMetaLabel && <p class="post-series-meta">{seriesMetaLabel}</p>}
-          <p class="post-description">{post.data.description}</p>
+          {explicitDescription && <p class="post-description">{explicitDescription}</p>}
         </div>
       </header>
 

@@ -6,7 +6,7 @@ const posts = defineCollection({
   schema: z
     .object({
       title: z.string(),
-      description: z.string(),
+      description: z.string().trim().min(1, 'description은 비어 있을 수 없습니다.'),
       pubDate: z.coerce.date(),
       category: z.enum(['series', 'tech', 'journal', 'club', 'review', 'notice', 'finance']),
       coverImage: z.string().optional(),
