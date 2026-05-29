@@ -1,0 +1,28 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" rx="32" fill="#0F172A"/>
+  <rect x="56" y="56" width="1088" height="518" rx="28" fill="#111827"/>
+  <rect x="84" y="100" width="180" height="28" rx="14" fill="#1D4ED8" fill-opacity="0.18"/>
+  <text x="84" y="120" fill="#60A5FA" font-family="Pretendard, Apple SD Gothic Neo, sans-serif" font-size="22" font-weight="800" letter-spacing="0.18em">
+    EVENT PROMOTION
+  </text>
+  <text x="84" y="230" fill="#F8FAFC" font-family="Pretendard, Apple SD Gothic Neo, sans-serif" font-size="74" font-weight="900">
+    행사 프로모션 카드
+  </text>
+  <text x="84" y="300" fill="#94A3B8" font-family="Pretendard, Apple SD Gothic Neo, sans-serif" font-size="30" font-weight="600">
+    모집 오픈부터 마감 임박까지
+  </text>
+  <text x="84" y="344" fill="#94A3B8" font-family="Pretendard, Apple SD Gothic Neo, sans-serif" font-size="30" font-weight="600">
+    행사 안내를 카드형 포맷으로 빠르게 전하는 연재
+  </text>
+  <rect x="84" y="420" width="232" height="56" rx="28" fill="#2563EB"/>
+  <text x="128" y="456" fill="#FFFFFF" font-family="Pretendard, Apple SD Gothic Neo, sans-serif" font-size="28" font-weight="800">
+    Series Template
+  </text>
+  <circle cx="950" cy="205" r="110" fill="#2563EB"/>
+  <circle cx="1028" cy="285" r="74" fill="#38BDF8"/>
+  <circle cx="895" cy="345" r="52" fill="#FACC15"/>
+  <rect x="780" y="390" width="280" height="116" rx="28" fill="#F8FAFC"/>
+  <rect x="814" y="426" width="154" height="18" rx="9" fill="#CBD5E1"/>
+  <rect x="814" y="458" width="212" height="18" rx="9" fill="#E2E8F0"/>
+  <rect x="814" y="490" width="188" height="18" rx="9" fill="#E2E8F0"/>
+</svg>
