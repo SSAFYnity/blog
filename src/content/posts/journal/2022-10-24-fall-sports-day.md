@@ -1,6 +1,6 @@
 ---
 title: "치열하고 유쾌했던 첫 가을 운동회"
-description: ""
+description: "SSAFYnity 첫 가을 운동회에서 몸풀기부터 팀전 경기, 뒷풀이 분위기까지 담은 행사 일지입니다."
 pubDate: 2022-10-24
 category: journal
 author:

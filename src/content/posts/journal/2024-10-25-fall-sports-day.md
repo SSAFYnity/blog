@@ -1,6 +1,6 @@
 ---
 title: "초가을 바람 속에서 함께한 가을 체육대회"
-description: ""
+description: "이촌한강공원에서 진행된 2024 가을 체육대회의 팀전 경기와 초가을 현장 분위기를 담은 기록입니다."
 pubDate: 2024-10-25
 category: journal
 author:

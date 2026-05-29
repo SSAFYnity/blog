@@ -1,6 +1,6 @@
 ---
 title: "개발 경험과 기술을 나눈 첫 SSAFYnale"
-description: ""
+description: "개발 경험과 기술 이야기를 나눈 제1회 SSAFYnale의 발표 현장과 운영 준비 과정을 담은 기록입니다."
 pubDate: 2023-06-14
 category: journal
 author:

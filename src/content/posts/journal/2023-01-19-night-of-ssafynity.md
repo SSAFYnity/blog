@@ -1,6 +1,6 @@
 ---
 title: "추억과 웃음으로 채운 첫 번째 싸피인의 밤"
-description: ""
+description: "제1회 싸피인의 밤 준비 과정과 현장 사진, 참가자 추억을 모아 정리한 행사 기록입니다."
 pubDate: 2023-01-19
 category: journal
 author:

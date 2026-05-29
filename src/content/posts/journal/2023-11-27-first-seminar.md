@@ -1,6 +1,6 @@
 ---
 title: "뜨거운 열기로 함께한 제1회 싸피니티 세미나"
-description: ""
+description: "역삼 멀티캠퍼스에서 열린 제1회 SSAFYnity 세미나의 준비 과정과 현장 분위기를 기록한 글입니다."
 pubDate: 2023-11-27
 category: journal
 author:

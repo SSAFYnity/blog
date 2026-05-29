@@ -1,6 +1,6 @@
 ---
 title: "노란 테마와 웃음으로 채운 2025 싸피인의 밤"
-description: ""
+description: "노란 드레스코드와 게임, 시상, 네트워킹으로 채워진 2025 싸피인의 밤 현장을 정리한 행사 일지입니다."
 pubDate: 2025-04-06
 category: journal
 author:

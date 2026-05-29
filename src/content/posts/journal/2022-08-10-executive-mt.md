@@ -1,6 +1,6 @@
 ---
 title: "집행부가 한층 가까워진 여름 MT"
-description: ""
+description: "전국 각지의 집행부가 대성리에 모여 친목과 협업 기반을 다진 여름 MT 기록입니다."
 pubDate: 2022-08-10
 category: journal
 author:

@@ -1,6 +1,6 @@
 ---
 title: "봄 MT로 더 가까워진 2대 집행부"
-description: ""
+description: "2대 집행부가 게임과 대화를 통해 더 가까워진 봄 MT의 분위기를 담은 운영진 기록입니다."
 pubDate: 2023-04-09
 category: journal
 author:

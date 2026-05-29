@@ -1,6 +1,6 @@
 ---
 title: "SSAFYnity의 시작을 알린 발대식"
-description: ""
+description: "SSAFYnity의 출범을 알린 발대식 현장과 첫 네트워킹 순간을 기록한 행사 일지입니다."
 pubDate: 2022-06-14
 category: journal
 author:

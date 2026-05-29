@@ -1,6 +1,6 @@
 ---
 title: "만남과 추억이 가득했던 2024 싸피인의 밤"
-description: ""
+description: "합정에서 열린 2024 싸피인의 밤의 포토월, 후원, 네트워킹 분위기를 담은 행사 리뷰입니다."
 pubDate: 2024-02-26
 category: journal
 author:

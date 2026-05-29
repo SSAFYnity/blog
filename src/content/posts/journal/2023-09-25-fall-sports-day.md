@@ -1,6 +1,6 @@
 ---
 title: "팀워크와 열기로 가득했던 가을 체육대회"
-description: ""
+description: "뚝섬한강공원에서 열린 SSAFYnity 가을 체육대회의 준비 과정과 경기 현장을 담은 행사 일지입니다."
 pubDate: 2023-09-25
 category: journal
 author:
