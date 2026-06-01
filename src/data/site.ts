@@ -44,6 +44,11 @@ export const site = {
       showInFooter: true,
     },
     {
+      label: 'YouTube',
+      href: 'https://www.youtube.com/channel/UCMy3Z7DsqJI1jcHBp-mOkoQ',
+      showInFooter: true,
+    },
+    {
       label: 'LinkedIn',
       href: 'https://www.linkedin.com/company/ssafynity',
       showInFooter: true,
