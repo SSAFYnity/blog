@@ -40,6 +40,11 @@ export const eventArchive = [
   { slug: '2025-ssafynale', title: '제 3회 SSAFYnale', kind: 'regular' },
   { slug: '2025-potluck-party', title: '포트락 파티', kind: 'regular' },
   { slug: '2025-career-party', title: '커리어파티', kind: 'regular' },
+  { slug: '2026-online-tetris-tournament', title: '온라인 테트리스 대회', kind: 'special', eventDateLabel: '2026년 5월 31일 · 22:00 - 22:30' },
+  { slug: '2026-first-regular-event', title: '제4회 싸피인의 밤', kind: 'regular', eventDateLabel: '2026년 6월 27일 · 13:30 - 22:00' },
+  { slug: '2026-ongoing-event-august', title: '8월 상시행사 (변동 가능성 있음)', kind: 'ongoing' },
+  { slug: '2026-ongoing-event-september', title: '9월 상시행사 (변동 가능성 있음)', kind: 'ongoing' },
+  { slug: '2026-second-half-regular-event', title: '하반기 정기행사 - IT 공개 행사', kind: 'regular' },
 ] as const satisfies readonly EventArchiveItem[]
 
 export const eventKindLabels = {
