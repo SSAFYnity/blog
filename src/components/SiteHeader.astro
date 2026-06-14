@@ -6,6 +6,29 @@ const normalizedPath = currentPath.endsWith('/') ? currentPath : `${currentPath}
 const isHomePath = normalizedPath === '/blog/' || normalizedPath === '/'
 const isHrefActive = (href: string) => normalizedPath.startsWith(href)
 const isSlugActive = (slug: CategorySlug) => normalizedPath.startsWith(`/blog/category/${slug}/`)
+
+type NavGroup = (typeof navGroups)[number]
+
+const topLevelCategoryLinks = navGroups
+  .filter((item): item is Extract<NavGroup, { type: 'link' }> => item.type === 'link')
+  .map((item) => ({
+    label: item.label,
+    href: item.href,
+    slug: item.slugs[0],
+  }))
+
+const mobileNavGroups = [
+  {
+    label: '콘텐츠',
+    items: topLevelCategoryLinks,
+  },
+  ...navGroups
+    .filter((item): item is Extract<NavGroup, { type: 'group' }> => item.type === 'group')
+    .map((item) => ({
+      label: item.label,
+      items: item.items,
+    })),
+]
 ---
 
 <header
@@ -78,47 +101,40 @@ const isSlugActive = (slug: CategorySlug) => normalizedPath.startsWith(`/blog/ca
     class="mobile-nav-drawer"
     id="mobile-nav-drawer"
     aria-label="모바일 메뉴"
+    aria-hidden="true"
     data-mobile-nav-drawer
     >
     <div class="mobile-nav-shell">
-      <button
-        class="mobile-nav-close"
-        type="button"
-        aria-label="메뉴 닫기"
-        data-mobile-nav-close
-      >
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="m6.75 6.75 10.5 10.5M17.25 6.75 6.75 17.25"></path>
-        </svg>
-      </button>
+      <div class="mobile-nav-head">
+        <p class="mobile-nav-heading">메뉴</p>
+        <button
+          class="mobile-nav-close"
+          type="button"
+          aria-label="메뉴 닫기"
+          data-mobile-nav-close
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m6.75 6.75 10.5 10.5M17.25 6.75 6.75 17.25"></path>
+          </svg>
+        </button>
+      </div>
       <div class="mobile-nav-group">
         <nav class="mobile-nav-links" aria-label="모바일 블로그 메뉴">
-          {navGroups.map((item) =>
-            item.type === 'link' ? (
-              <div class="mobile-nav-section">
-                <a
-                  class:list={['mobile-nav-section-link', { 'is-active': item.slugs.some((slug) => isSlugActive(slug)) }]}
-                  href={item.href}
-                >
-                  {item.label}
-                </a>
+          {mobileNavGroups.map((group) => (
+            <div class="mobile-nav-section">
+              <p class="mobile-nav-title">{group.label}</p>
+              <div class="mobile-nav-group-links">
+                {group.items.map((child) => (
+                  <a
+                    class:list={['mobile-nav-link', 'is-child', { 'is-active': isSlugActive(child.slug) }]}
+                    href={child.href}
+                  >
+                    <span>{child.label}</span>
+                  </a>
+                ))}
               </div>
-            ) : (
-              <div class="mobile-nav-section">
-                <p class="mobile-nav-title">{item.label}</p>
-                <div class="mobile-nav-group-links">
-                  {item.items.map((child) => (
-                    <a
-                      class:list={['mobile-nav-link', 'is-child', { 'is-active': isSlugActive(child.slug) }]}
-                      href={child.href}
-                    >
-                      <span>{child.label}</span>
-                    </a>
-                  ))}
-                </div>
-              </div>
-            ),
-          )}
+            </div>
+          ))}
         </nav>
       </div>
     </div>
@@ -159,17 +175,26 @@ const isSlugActive = (slug: CategorySlug) => normalizedPath.startsWith(`/blog/ca
 
   const closeMobileMenu = () => {
     if (!header || !menuToggle || !menuDrawer || !menuBackdrop) return
+    const savedScrollY = Number(document.body.dataset.scrollY || '0')
 
     header.classList.remove('is-mobile-open')
     menuToggle.setAttribute('aria-expanded', 'false')
+    menuDrawer.setAttribute('aria-hidden', 'true')
     document.body.classList.remove('is-mobile-nav-open')
+    document.body.style.top = ''
+    delete document.body.dataset.scrollY
+    window.scrollTo(0, savedScrollY)
   }
 
   const openMobileMenu = () => {
     if (!header || !menuToggle || !menuDrawer || !menuBackdrop) return
+    const scrollY = window.scrollY
 
     header.classList.add('is-mobile-open')
     menuToggle.setAttribute('aria-expanded', 'true')
+    menuDrawer.setAttribute('aria-hidden', 'false')
+    document.body.dataset.scrollY = String(scrollY)
+    document.body.style.top = `-${scrollY}px`
     document.body.classList.add('is-mobile-nav-open')
   }
 

@@ -38,12 +38,23 @@
 }
 
 html {
+  min-height: 100%;
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scrollbar-gutter: stable;
+}
+
+@supports not (scrollbar-gutter: stable) {
+  html {
+    overflow-y: scroll;
+  }
 }
 
 body {
   margin: 0;
   min-height: 100vh;
+  min-height: 100svh;
   font-family: 'Pretendard', sans-serif;
   color: var(--text);
   background: var(--bg);
@@ -51,6 +62,16 @@ body {
 
 body.is-mobile-nav-open {
   overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
+}
+
+@supports (-webkit-touch-callout: none) {
+  body.is-mobile-nav-open {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+  }
 }
 
 a {
@@ -244,7 +265,10 @@ p {
   top: 0;
   right: 0;
   width: min(100vw, 24rem);
+  height: 100vh;
+  min-height: 100vh;
   height: 100dvh;
+  min-height: 100dvh;
   padding: 0;
   background: #ffffff;
   border-left: 1px solid var(--color-border);
@@ -1175,6 +1199,19 @@ p {
 @media (max-width: 900px) {
   .club-hub-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@supports (height: 100svh) {
+  .mobile-nav-drawer {
+    min-height: 100svh;
+  }
+}
+
+@supports (-webkit-touch-callout: none) and (not (height: 100dvh)) {
+  .mobile-nav-drawer {
+    height: -webkit-fill-available;
+    min-height: -webkit-fill-available;
   }
 }
 
@@ -3831,7 +3868,7 @@ a.series-card-badge:focus-visible {
 
 @media (max-width: 720px) {
   .mobile-nav-drawer {
-    width: 100vw;
+    width: min(100vw, 24rem);
   }
 
   .brand-logo {
@@ -4309,6 +4346,15 @@ body {
   background: rgba(255, 255, 255, 0.98);
   box-shadow: 0 20px 48px rgba(15, 23, 42, 0.12);
   backdrop-filter: blur(14px);
+}
+
+.nav-group-menu::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -10px;
+  height: 10px;
 }
 
 .nav-group-menu[hidden] {
@@ -5321,5 +5367,359 @@ body {
       calc(3.5rem + env(safe-area-inset-top))
       20px
       calc(env(safe-area-inset-bottom) + 24px);
+  }
+}
+
+/* Align mobile menu motion and backdrop with the official site. */
+.mobile-nav-backdrop {
+  z-index: 55;
+  background: rgba(2, 6, 23, 0.3);
+  transition-duration: 300ms;
+}
+
+.mobile-nav-drawer {
+  z-index: 60;
+  width: min(100vw, 24rem);
+  opacity: 1;
+  visibility: visible;
+  transition:
+    transform 300ms ease-in-out,
+    visibility 300ms ease-in-out;
+}
+
+.site-header.is-mobile-open .mobile-nav-backdrop,
+.site-header.is-mobile-open .mobile-nav-drawer {
+  transition-duration: 300ms;
+}
+
+.mobile-nav-shell {
+  gap: 24px;
+  padding:
+    calc(5rem + env(safe-area-inset-top))
+    24px
+    calc(env(safe-area-inset-bottom) + 24px);
+}
+
+.mobile-nav-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.mobile-nav-heading {
+  margin: 0;
+  color: #0f172a;
+  font-size: 1.125rem;
+  font-weight: 800;
+  line-height: 1.5555556;
+}
+
+.mobile-nav-close {
+  position: static;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #334155;
+  opacity: 1;
+}
+
+.mobile-nav-close:hover {
+  background: #f1f5f9;
+}
+
+.mobile-nav-close svg {
+  width: 18px;
+  height: 18px;
+}
+
+.mobile-nav-links {
+  gap: 24px;
+}
+
+.mobile-nav-section {
+  gap: 12px;
+}
+
+.mobile-nav-title {
+  color: #0f172a;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.mobile-nav-section-link {
+  min-height: 44px;
+  color: #0f172a;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.mobile-nav-group-links {
+  gap: 4px;
+  padding-left: 16px;
+  border-left-color: rgb(30 58 138 / 0.1);
+}
+
+.mobile-nav-link,
+.mobile-nav-link.is-child {
+  min-height: 44px;
+  padding: 10px 8px;
+  border-radius: 8px;
+  color: #64748b;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.4285714;
+}
+
+.mobile-nav-link:hover,
+.mobile-nav-link.is-active,
+.mobile-nav-section-link.is-active {
+  background: #eff6ff;
+  color: #1e3a8a;
+}
+
+@media (max-width: 720px) {
+  .mobile-nav-shell {
+    padding:
+      calc(5rem + env(safe-area-inset-top))
+      24px
+      calc(env(safe-area-inset-bottom) + 24px);
+  }
+}
+
+/* Mobile-only responsive hardening.
+   Keep desktop rules intact and patch only narrow viewports. */
+@media (max-width: 767px) {
+  .post-detail-header,
+  .post-detail {
+    overflow: hidden;
+  }
+
+  .post-detail-header h1,
+  .post-card-link h3,
+  .series-hub-title h2,
+  .club-hub-title,
+  .notice-row-head h2,
+  .activity-card h2,
+  .finance-row h2 {
+    overflow-wrap: anywhere;
+    word-break: keep-all;
+  }
+
+  .post-meta-row,
+  .series-card-meta-row {
+    min-width: 0;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+
+  .post-meta-row time,
+  .series-card-meta-row time {
+    max-width: 100%;
+  }
+
+  .pill,
+  .series-card-badge,
+  .post-series-card-meta {
+    max-width: 100%;
+  }
+
+  .tag-list,
+  .activity-tag-list,
+  .finance-tag-list {
+    min-width: 0;
+  }
+
+  .tag-list li,
+  .activity-tag-list li,
+  .finance-tag-list li {
+    overflow-wrap: anywhere;
+  }
+
+  .prose {
+    overflow-wrap: break-word;
+  }
+
+  .prose :is(p, li, blockquote, figcaption, h2, h3, h4) {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: keep-all;
+  }
+
+  .prose a {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .prose :is(img, video, iframe) {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .prose pre {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .prose code {
+    overflow-wrap: anywhere;
+  }
+
+  .prose table {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .archive-controls {
+    align-items: stretch;
+  }
+
+  .archive-search {
+    flex: 1 1 100%;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .archive-search input {
+    min-width: 0;
+  }
+
+  .archive-search-button {
+    flex: 0 0 auto;
+  }
+}
+
+@media (max-width: 420px) {
+  .archive-search {
+    flex-wrap: wrap;
+  }
+
+  .archive-search input,
+  .archive-search-button {
+    width: 100%;
+  }
+}
+
+/* Final no-shadow pass.
+   Keep depth from borders/background only so the blog matches the official site direction. */
+:root {
+  --shadow-sm: none;
+  --shadow-md: none;
+}
+
+.site-header.is-scrolled,
+.nav-group-menu,
+.nav-action:hover,
+.mobile-nav-drawer,
+.redesign-hero-head,
+.hero-visual-center,
+.hero-visual-item,
+.home-main-hero .hero-visual-item,
+.category-intro-card,
+.review-invite-link,
+.archive-summary-card,
+.redesign-latest-item,
+.featured-story,
+.magazine-card,
+.section-panel,
+.dossier-card,
+.recent-stack-card,
+.visual-card,
+.latest-main,
+.latest-item,
+.category-band-item,
+.notice-row,
+.activity-card,
+.finance-row,
+.review-entry,
+.series-view-switch,
+.series-view-link,
+.series-hub-card,
+.club-directory-card,
+.post-card,
+.post-card.featured,
+.archive-controls,
+.archive-hero,
+.archive-empty-state,
+.post-detail,
+.post-detail-header,
+.post-aside-card,
+.tag-list,
+.archive-dropdown-menu,
+.post-aside-kicker-mark,
+.prose img {
+  box-shadow: none;
+}
+
+.category-intro-card:hover,
+.review-invite-link:hover,
+.archive-summary-card:hover,
+.featured-story:hover,
+.magazine-card:hover,
+.section-panel:hover,
+.dossier-card:hover,
+.recent-stack-card:hover,
+.visual-card:hover,
+.latest-main:hover,
+.latest-item:hover,
+.category-band-item:hover,
+.notice-row:hover,
+.activity-card:hover,
+.finance-row:hover,
+.review-entry:hover,
+.series-hub-card:hover,
+.club-directory-card:hover,
+.post-card:hover,
+.redesign-latest-item:hover {
+  box-shadow: none;
+}
+
+/* Keep hover feedback inside the component.
+   Containers should not jump on hover. */
+.nav-action:hover,
+.featured-story:hover,
+.magazine-card:hover,
+.section-panel:hover,
+.dossier-card:hover,
+.recent-stack-card:hover,
+.visual-card:hover,
+.latest-main:hover,
+.latest-item:hover,
+.category-band-item:hover,
+.archive-note-item:hover,
+.category-card:hover,
+.notice-row:hover,
+.activity-card:hover,
+.finance-row:hover,
+.review-entry:hover,
+.series-hub-card:hover,
+.club-directory-card:hover,
+.post-card:hover,
+.post-card.featured:hover,
+.redesign-latest-item:hover,
+.category-intro-card:hover,
+.review-invite-link:hover,
+.archive-summary-card:hover,
+.browse-column-item:hover,
+.record-card:hover,
+.redesign-archive-item:hover {
+  transform: none;
+}
+
+@media (min-width: 768px) {
+  .site-header.is-home:not(.is-scrolled) {
+    background: #edf1f8;
   }
 }
