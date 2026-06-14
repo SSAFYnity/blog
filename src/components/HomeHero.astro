@@ -1,38 +1,65 @@
 ---
 interface Props {
   postsCount: number
-  categoriesCount: number
 }
 
-const { postsCount, categoriesCount } = Astro.props
+const { postsCount } = Astro.props
+
+const heroVisualItems = [
+  {
+    label: 'Notice',
+    text: '공식 안내',
+    className: 'is-notice',
+    iconPath: 'M14.25 18a2.25 2.25 0 0 1-4.5 0m7.5-7.5V9a5.25 5.25 0 1 0-10.5 0v1.5L5.25 13.5h13.5l-1.5-3Z',
+  },
+  {
+    label: 'Activity',
+    text: '활동 기록',
+    className: 'is-activity',
+    iconPath: 'M7.5 7.5h9m-9 4.5h5.25m-6.75 7.5h12A2.25 2.25 0 0 0 20.25 17.25V8.25A2.25 2.25 0 0 0 18 6H6A2.25 2.25 0 0 0 3.75 8.25v9A2.25 2.25 0 0 0 6 19.5Zm9.75-13.5V4.875A1.125 1.125 0 0 0 14.625 3.75h-5.25A1.125 1.125 0 0 0 8.25 4.875V6',
+  },
+  {
+    label: 'Archive',
+    text: `${postsCount}개의 기록`,
+    className: 'is-archive',
+    iconPath: 'M6.75 4.5A2.25 2.25 0 0 0 4.5 6.75v10.5A2.25 2.25 0 0 0 6.75 19.5h10.5a2.25 2.25 0 0 0 2.25-2.25V8.56a2.25 2.25 0 0 0-.66-1.59l-1.81-1.81a2.25 2.25 0 0 0-1.59-.66H6.75Zm2.25 3h6m-6 3h6m-6 3h3',
+  },
+] as const
 ---
 
 <section class="hero-band home-main-hero">
   <div class="redesign-hero shell">
     <div class="redesign-hero-head astro-reveal">
-      <div class="redesign-kicker">✦ 싸피니티 SSAFYnity 공식 아카이브</div>
+      <div class="redesign-kicker">SSAFYnity Blog</div>
       <h1>
-        <span class="hero-title-line">싸피니티의 기록이</span>
-        <span class="hero-title-line hero-title-accent">계속되는 공간</span>
+        <span class="hero-title-line">싸피니티 블로그</span>
+        <span class="hero-title-line hero-title-accent">공식 아카이브</span>
       </h1>
       <p class="redesign-intro">
-        싸피니티(SSAFYnity)의 공지, 일지, 동아리, 연재, 기술, 후기, 회비 기록을 함께 쌓아가는 공식 아카이브입니다.
+        공지와 활동 기록, 운영 자료를 차분히 쌓아가는 공식 블로그입니다.
       </p>
 
-      <div class="hero-stat-row">
-        <div>
-          <span>공개 글</span>
-          <strong>{postsCount}개</strong>
-        </div>
-        <div>
-          <span>카테고리</span>
-          <strong>{categoriesCount}개</strong>
-        </div>
-        <div>
-          <span>참여 가능</span>
-          <strong>후기 작성</strong>
-        </div>
+      <div class="hero-cta-row">
+        <a class="hero-cta is-primary" href="#latest">최신 글 보기</a>
+        <a class="hero-cta" href="#reading-guide">읽기 가이드</a>
       </div>
+    </div>
+
+    <div class="hero-visual-field" aria-label="블로그 주요 안내">
+      <div class="hero-visual-center">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 5.25v13.5m6.75-10.5v9a2.25 2.25 0 0 1-2.25 2.25H7.5a2.25 2.25 0 0 1-2.25-2.25v-9m13.5 0A2.25 2.25 0 0 0 16.5 6H7.5a2.25 2.25 0 0 0-2.25 2.25m13.5 0H5.25"></path>
+        </svg>
+      </div>
+      {heroVisualItems.map((item) => (
+        <div class={`hero-visual-item ${item.className}`}>
+          <span>{item.label}</span>
+          <strong>{item.text}</strong>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d={item.iconPath}></path>
+          </svg>
+        </div>
+      ))}
     </div>
   </div>
 </section>

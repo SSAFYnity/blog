@@ -17,8 +17,8 @@ const leadPosts = posts.filter((post) => post.data.category !== 'review').slice(
 ---
 
 <BaseLayout title={`공식 콘텐츠 아카이브 | ${site.title}`} description={site.description}>
-  <HomeHero postsCount={posts.length} categoriesCount={site.categories.length} />
-  <HomeCategoryIntro categories={site.categories} />
+  <HomeHero postsCount={posts.length} />
+  <HomeCategoryIntro />
   <HomeLatestSection posts={leadPosts} />
   <HomeReviewInvite />
   <HomeArchiveSummary />
