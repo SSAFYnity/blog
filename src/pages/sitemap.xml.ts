@@ -1,4 +1,5 @@
 import { getCollection } from 'astro:content'
+import { clubArchive } from '../data/clubs'
 import { site } from '../data/site'
 import { getSeriesDirectoryMeta } from '../data/series'
 import { isPublicPost } from '../lib/content'
@@ -33,6 +34,18 @@ export async function GET() {
         .map((post) => getSeriesDirectoryMeta(post.data.seriesMeta?.label ?? post.data.title).slug)
     )
   )
+  const clubPages = clubArchive
+    .map((club) => {
+      const latestPost = posts.find((post) => post.data.category === 'club' && post.data.clubSlug === club.slug)
+
+      return latestPost
+        ? {
+            slug: club.slug,
+            lastmod: latestPost.data.pubDate.toISOString().slice(0, 10),
+          }
+        : null
+    })
+    .filter((clubPage): clubPage is { slug: string; lastmod: string } => clubPage !== null)
 
   const staticEntries = [
     { loc: normalizeUrl('/'), lastmod: undefined },
@@ -45,6 +58,10 @@ export async function GET() {
     ...seriesPages.map((seriesSlug) => ({
       loc: normalizeUrl(`/series/${seriesSlug}/`),
       lastmod: undefined,
+    })),
+    ...clubPages.map((clubPage) => ({
+      loc: normalizeUrl(`/club/${clubPage.slug}/`),
+      lastmod: clubPage.lastmod,
     })),
   ]
 
