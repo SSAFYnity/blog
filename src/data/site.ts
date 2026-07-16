@@ -3,7 +3,7 @@
 // 카테고리 정의와 카테고리별 표시 정보는 블로그가 원본입니다.
 // [업데이트 필요] 홈 URL, 공식 메일, SNS 링크 변경 시 메인 siteData.ts를 먼저 수정한 뒤 여기 반영하세요.
 // [주의] 이 값은 블로그 Header, Footer, 메타 정보에 함께 반영됩니다.
-// 함께 확인: /Users/hyeona/Dev/SSAFYnity/ssafynity.github.io/src/data/siteData.ts
+// 함께 확인: ssafynity.github.io/src/site/data/siteData.ts
 export const site = {
   brandName: '싸피니티',
   englishName: 'SSAFYnity',

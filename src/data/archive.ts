@@ -4,7 +4,7 @@ import type { CategorySlug } from './site'
 // 페이지 내부에 흩어지기 쉬운 필터/빈 상태 문구를 한 곳에서 관리합니다.
 // [업데이트 필요] 필터 문구, 빈 상태 문구, 연도 옵션 변경 시 이 파일만 수정하세요.
 // [주의] 화면 문구 변경이므로 메인 사이트와 톤앤매너가 어긋나지 않는지 함께 확인하세요.
-// 함께 확인: /Users/hyeona/Dev/SSAFYnity/Design/data.md
+// 함께 확인: SSAFYnity 작업공간의 Design/data.md
 export const archiveYearOptions = [
   { value: '2026', label: '2026(5대)' },
   { value: '2025', label: '2025(4대)' },

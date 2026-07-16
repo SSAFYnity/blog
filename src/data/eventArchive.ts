@@ -3,8 +3,8 @@
 // slug/title/kind 변경 시 공식홈페이지 수정 후 이 파일도 함께 반영합니다.
 // [업데이트 필요] 행사 slug/title/kind 변경 시 메인 행사 데이터를 먼저 수정한 뒤 이 파일을 함께 반영하세요.
 // [주의] 공개된 slug는 가능하면 변경하지 않습니다.
-// 함께 확인: /Users/hyeona/Dev/SSAFYnity/ssafynity.github.io/src/data/events/index.ts
-// 함께 확인: /Users/hyeona/Dev/SSAFYnity/ssafynity.github.io/src/data/events/
+// 함께 확인: ssafynity.github.io/src/site/data/events/index.ts
+// 함께 확인: ssafynity.github.io/src/site/data/events/
 type EventArchiveKind = 'regular' | 'ongoing' | 'special'
 
 type EventArchiveItem = {
