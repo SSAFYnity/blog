@@ -4,7 +4,6 @@ import { navGroups, site, type CategorySlug } from '../data/site'
 const currentPath = Astro.url.pathname
 const normalizedPath = currentPath.endsWith('/') ? currentPath : `${currentPath}/`
 const isHomePath = normalizedPath === '/blog/' || normalizedPath === '/'
-const isHrefActive = (href: string) => normalizedPath.startsWith(href)
 const isSlugActive = (slug: CategorySlug) => normalizedPath.startsWith(`/blog/category/${slug}/`)
 
 type NavGroup = (typeof navGroups)[number]

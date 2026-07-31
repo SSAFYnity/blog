@@ -34,18 +34,16 @@ export async function GET() {
         .map((post) => getSeriesDirectoryMeta(post.data.seriesMeta?.label ?? post.data.title).slug)
     )
   )
-  const clubPages = clubArchive
-    .map((club) => {
-      const latestPost = posts.find((post) => post.data.category === 'club' && post.data.clubSlug === club.slug)
+  const clubPages = clubArchive.flatMap((club) => {
+    const latestPost = posts.find((post) => post.data.category === 'club' && post.data.clubSlug === club.slug)
 
-      return latestPost
-        ? {
-            slug: club.slug,
-            lastmod: latestPost.data.pubDate.toISOString().slice(0, 10),
-          }
-        : null
-    })
-    .filter((clubPage): clubPage is { slug: string; lastmod: string } => clubPage !== null)
+    return latestPost
+      ? [{
+          slug: club.slug,
+          lastmod: latestPost.data.pubDate.toISOString().slice(0, 10),
+        }]
+      : []
+  })
 
   const staticEntries = [
     { loc: normalizeUrl('/'), lastmod: undefined },
