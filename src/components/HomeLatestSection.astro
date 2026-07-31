@@ -2,6 +2,7 @@
 import type { CollectionEntry } from 'astro:content'
 
 import { categoryStyles, getCategoryTitle } from '../data/site'
+import Badge from './Badge.astro'
 
 interface Props {
   posts: CollectionEntry<'posts'>[]
@@ -39,9 +40,9 @@ const { posts } = Astro.props
           >
             <div class="redesign-latest-copy">
               <div class="redesign-latest-item-meta">
-                <span class={`pill ${categoryStyles[post.data.category]}`}>
+                <Badge tone={categoryStyles[post.data.category]}>
                   {getCategoryTitle(post.data.category)}
-                </span>
+                </Badge>
                 <span class="redesign-latest-date">
                   {new Intl.DateTimeFormat('ko-KR', {
                     year: 'numeric',

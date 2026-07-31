@@ -127,14 +127,16 @@ export const categoryMap = Object.fromEntries(
   site.categories.map((category) => [category.slug, category])
 ) as Record<CategorySlug, Category>
 
-export const categoryStyles: Record<CategorySlug, string> = {
-  club: 'is-violet',
-  series: 'is-emerald',
-  tech: 'is-blue',
-  journal: 'is-sky',
-  review: 'is-slate',
-  notice: 'is-navy',
-  finance: 'is-amber',
+export type CategoryBadgeTone = 'blue' | 'emerald' | 'sky' | 'violet' | 'slate' | 'navy' | 'amber'
+
+export const categoryStyles: Record<CategorySlug, CategoryBadgeTone> = {
+  club: 'violet',
+  series: 'emerald',
+  tech: 'blue',
+  journal: 'sky',
+  review: 'slate',
+  notice: 'navy',
+  finance: 'amber',
 }
 
 export const getCategoryTitle = (slug: CategorySlug) => categoryMap[slug].title

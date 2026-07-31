@@ -1,5 +1,6 @@
 ---
 import { getCollection, render } from 'astro:content'
+import Badge from '../components/Badge.astro'
 import BaseLayout from '../layouts/BaseLayout.astro'
 import { getClubArchiveUrl } from '../data/clubs'
 import { categoryStyles, getCategoryTitle } from '../data/site'
@@ -109,8 +110,9 @@ const seoDescription = explicitDescription || (
         <div class="post-detail-header-copy">
           <div class="post-meta-row">
             {seriesBackHref && seriesBackLabel ? (
-              <a
-                class="pill is-series"
+              <Badge
+                as="a"
+                kind="series"
                 href={seriesBackHref}
                 data-analytics-event="select_series_badge"
                 data-analytics-params={JSON.stringify({
@@ -119,11 +121,11 @@ const seoDescription = explicitDescription || (
                 })}
               >
                 {seriesBackLabel}
-              </a>
+              </Badge>
             ) : post.data.category !== 'journal' && (
-              <span class:list={['pill', categoryStyles[post.data.category] ?? 'is-slate']}>
+              <Badge tone={categoryStyles[post.data.category]}>
                 {getCategoryTitle(post.data.category)}
-              </span>
+              </Badge>
             )}
             {post.data.category !== 'journal' && (
               <time datetime={post.data.pubDate.toISOString()}>{dateLabel}</time>

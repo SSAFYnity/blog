@@ -1,0 +1,36 @@
+---
+type BadgeKind = 'category' | 'series' | 'series-card'
+type BadgeTone = 'blue' | 'emerald' | 'sky' | 'violet' | 'slate' | 'navy' | 'amber'
+
+interface Props {
+  as?: keyof HTMLElementTagNameMap
+  kind?: BadgeKind
+  tone?: BadgeTone
+  className?: string
+  class?: string
+}
+
+const {
+  as = 'span',
+  kind = 'category',
+  tone = 'slate',
+  className = '',
+  class: classProp = '',
+  ...attrs
+} = Astro.props as Props
+
+const Tag = as
+---
+
+<Tag
+  {...attrs}
+  class={[
+    'badge',
+    `badge--${kind}`,
+    kind === 'category' && `badge--${tone}`,
+    classProp,
+    className,
+  ].filter(Boolean).join(' ')}
+>
+  <slot />
+</Tag>
