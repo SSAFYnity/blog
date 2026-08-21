@@ -1,25 +1,659 @@
 ---
 import { getCollection } from 'astro:content'
 import BaseLayout from '../layouts/BaseLayout.astro'
-import HomeCategoryIntro from '../components/HomeCategoryIntro.astro'
 import HomeHero from '../components/HomeHero.astro'
-import HomeLatestSection from '../components/HomeLatestSection.astro'
-import HomeReviewInvite from '../components/HomeReviewInvite.astro'
-import HomeArchiveSummary from '../components/HomeArchiveSummary.astro'
-import { site } from '../data/site'
+import { getCategoryTitle, site } from '../data/site'
 import { isPublicPost } from '../lib/content'
 
 const posts = (await getCollection('posts'))
   .filter(isPublicPost)
   .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime())
 
-const leadPosts = posts.filter((post) => post.data.category !== 'review').slice(0, 6)
+const leadPost = posts[0]
+const recentPosts = posts.slice(1, 6)
+const categoryLinks = site.categories.map((category) => ({
+  ...category,
+  count: posts.filter((post) => post.data.category === category.slug).length,
+  href: `/blog/category/${category.slug}/`,
+}))
+
+const formatDate = (date: Date) => new Intl.DateTimeFormat('ko-KR', {
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+}).format(date)
 ---
 
 <BaseLayout title={`공식 콘텐츠 아카이브 | ${site.title}`} description={site.description}>
   <HomeHero postsCount={posts.length} />
-  <HomeCategoryIntro />
-  <HomeLatestSection posts={leadPosts} />
-  <HomeReviewInvite />
-  <HomeArchiveSummary />
+  <div class="editorial-home">
+    {leadPost ? (
+      <section class="editorial-lead">
+        <div class="editorial-shell editorial-lead-grid">
+          <div class="editorial-lead-copy">
+            <div class="editorial-lead-meta">
+              <span>{getCategoryTitle(leadPost.data.category)}</span>
+              <time datetime={leadPost.data.pubDate.toISOString()}>{formatDate(leadPost.data.pubDate)}</time>
+            </div>
+            <h2>{leadPost.data.title}</h2>
+            <p>{leadPost.data.description}</p>
+            <div class="editorial-lead-actions">
+              <a
+                class="editorial-primary-action"
+                href={`/blog/${leadPost.slug}/`}
+                data-analytics-event="select_blog_post"
+                data-analytics-payload={JSON.stringify({
+                  post_slug: leadPost.slug,
+                  post_title: leadPost.data.title,
+                  post_category: leadPost.data.category,
+                  destination_url: `/blog/${leadPost.slug}/`,
+                  source_area: 'home_lead',
+                })}
+              >
+                최신 글 읽기
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"></path></svg>
+              </a>
+              <a class="editorial-text-action" href="/blog/posts/">전체 글 보기</a>
+            </div>
+          </div>
+
+          {leadPost.data.coverImage && (
+            <a
+              class="editorial-lead-image"
+              href={`/blog/${leadPost.slug}/`}
+              aria-label={`${leadPost.data.title} 읽기`}
+              data-analytics-event="select_blog_post"
+              data-analytics-payload={JSON.stringify({
+                post_slug: leadPost.slug,
+                post_title: leadPost.data.title,
+                post_category: leadPost.data.category,
+                destination_url: `/blog/${leadPost.slug}/`,
+                source_area: 'home_lead_image',
+              })}
+            >
+              <img src={leadPost.data.coverImage} alt="" />
+            </a>
+          )}
+        </div>
+      </section>
+    ) : (
+      <section class="editorial-empty-lead">
+        <div class="editorial-shell">
+          <h1>첫 기록을 준비하고 있습니다</h1>
+          <p>공식 공지와 활동 기록이 공개되면 이곳에서 가장 먼저 확인할 수 있습니다.</p>
+        </div>
+      </section>
+    )}
+
+    <section class="editorial-section" id="latest">
+      <div class="editorial-shell">
+        <div class="editorial-section-head">
+          <div>
+            <h2>최근 기록</h2>
+            <p>운영 공지와 행사, 콘텐츠 기록을 공개일 순서로 정리합니다.</p>
+          </div>
+          <a href="/blog/posts/">
+            전체 글
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"></path></svg>
+          </a>
+        </div>
+
+        {recentPosts.length > 0 ? (
+          <div class="editorial-post-list">
+            {recentPosts.map((post) => (
+              <article class="editorial-post-row">
+                <div class="editorial-post-meta">
+                  <span>{getCategoryTitle(post.data.category)}</span>
+                  <time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate)}</time>
+                </div>
+                <a
+                  class="editorial-post-copy"
+                  href={`/blog/${post.slug}/`}
+                  data-analytics-event="select_blog_post"
+                  data-analytics-payload={JSON.stringify({
+                    post_slug: post.slug,
+                    post_title: post.data.title,
+                    post_category: post.data.category,
+                    destination_url: `/blog/${post.slug}/`,
+                    source_area: 'home_recent',
+                  })}
+                >
+                  <strong>{post.data.title}</strong>
+                  <span>{post.data.description}</span>
+                </a>
+                {post.data.coverImage ? (
+                  <a class="editorial-post-thumb" href={`/blog/${post.slug}/`} aria-label={`${post.data.title} 대표 이미지`}>
+                    <img src={post.data.coverImage} alt="" loading="lazy" />
+                  </a>
+                ) : (
+                  <a class="editorial-post-arrow" href={`/blog/${post.slug}/`} aria-label={`${post.data.title} 읽기`}>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"></path></svg>
+                  </a>
+                )}
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div class="editorial-empty-row">
+            <strong>추가 기록을 준비하고 있습니다.</strong>
+            <p>새로운 글이 공개되면 최신순으로 표시됩니다.</p>
+          </div>
+        )}
+      </div>
+    </section>
+
+    <section class="editorial-section editorial-categories" id="reading-guide">
+      <div class="editorial-shell editorial-category-layout">
+        <div class="editorial-section-head editorial-category-head">
+          <div>
+            <h2>분류해서 읽기</h2>
+            <p>필요한 정보가 있다면 글의 성격에 맞는 분류에서 바로 찾을 수 있습니다.</p>
+          </div>
+        </div>
+
+        <nav class="editorial-category-list" aria-label="블로그 카테고리">
+          {categoryLinks.map((category) => (
+            <a href={category.href}>
+              <span>
+                <strong>{category.title}</strong>
+                <small>{category.description}</small>
+              </span>
+              <span class="editorial-category-count">{category.count}개</span>
+            </a>
+          ))}
+        </nav>
+      </div>
+    </section>
+
+    <section class="editorial-section editorial-contribute">
+      <div class="editorial-shell editorial-contribute-grid">
+        <div class="editorial-contribute-copy">
+          <h2>참여자의 경험도<br />공식 기록이 됩니다</h2>
+          <p>행사에 참여했다면 후기를 제출할 수 있습니다. 운영진이 참여 여부를 확인한 뒤 공개합니다.</p>
+          <div>
+            <a href="/blog/category/review/">공개된 후기 보기</a>
+            <a href="https://forms.gle/tM69YrDGWeYRDE8UA" target="_blank" rel="noopener noreferrer">후기 제출하기</a>
+          </div>
+        </div>
+
+        <div class="editorial-policy">
+          <h2>기록 공개 기준</h2>
+          <ul>
+            <li><strong>운영과 직접 관련된 내용만 공개합니다.</strong><span>행사, 활동, 회비, 운영 자료를 다룹니다.</span></li>
+            <li><strong>당해 운영진이 직접 관리합니다.</strong><span>게시와 수정, 공개 여부를 공식 기준에 따라 결정합니다.</span></li>
+            <li><strong>후기는 실제 참여 여부를 확인합니다.</strong><span>참여가 확인된 경험만 공식 기록으로 남깁니다.</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </div>
 </BaseLayout>
+
+<style>
+  .editorial-home {
+    background: #fff;
+    color: #0f172a;
+  }
+
+  .editorial-shell {
+    width: min(100% - 32px, 1180px);
+    margin-inline: auto;
+  }
+
+  .editorial-lead {
+    padding: 150px 0 78px;
+    background: #f8fafc;
+  }
+
+  .editorial-lead-grid {
+    display: grid;
+    gap: 48px;
+    align-items: center;
+  }
+
+  .editorial-lead-copy {
+    max-width: 670px;
+  }
+
+  .editorial-lead-meta,
+  .editorial-post-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .editorial-lead-meta span {
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: #1e3a8a;
+    color: #fff;
+  }
+
+  .editorial-lead h2,
+  .editorial-empty-lead h1 {
+    max-width: 720px;
+    margin: 22px 0 0;
+    font-size: clamp(2.8rem, 6.2vw, 5.4rem);
+    font-weight: 850;
+    letter-spacing: -0.04em;
+    line-height: 1.02;
+    text-wrap: balance;
+    word-break: keep-all;
+  }
+
+  .editorial-lead-copy > p,
+  .editorial-empty-lead p {
+    max-width: 620px;
+    margin: 26px 0 0;
+    color: #475569;
+    font-size: 17px;
+    font-weight: 550;
+    line-height: 1.75;
+    word-break: keep-all;
+  }
+
+  .editorial-lead-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 18px;
+    margin-top: 34px;
+  }
+
+  .editorial-primary-action {
+    display: inline-flex;
+    min-height: 50px;
+    align-items: center;
+    gap: 9px;
+    padding: 0 20px;
+    border-radius: 10px;
+    background: #1e3a8a;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 800;
+    text-decoration: none;
+  }
+
+  .editorial-primary-action:hover {
+    background: #172554;
+  }
+
+  .editorial-primary-action svg,
+  .editorial-section-head > a svg,
+  .editorial-post-arrow svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .editorial-text-action {
+    min-height: 44px;
+    padding: 12px 0 8px;
+    border-bottom: 1px solid #94a3b8;
+    color: #0f172a;
+    font-size: 14px;
+    font-weight: 750;
+    text-decoration: none;
+  }
+
+  .editorial-text-action:hover {
+    border-color: #2563eb;
+    color: #1d4ed8;
+  }
+
+  .editorial-lead-image {
+    display: block;
+    overflow: hidden;
+    aspect-ratio: 1 / 1;
+    border-radius: 16px;
+    background: #e2e8f0;
+  }
+
+  .editorial-lead-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 240ms ease;
+  }
+
+  .editorial-lead-image:hover img {
+    transform: scale(1.02);
+  }
+
+  .editorial-empty-lead {
+    padding: 176px 0 110px;
+    background: #f8fafc;
+  }
+
+  .editorial-section {
+    padding: 92px 0;
+  }
+
+  .editorial-section-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 28px;
+    margin-bottom: 42px;
+  }
+
+  .editorial-section-head > div {
+    max-width: 650px;
+  }
+
+  .editorial-section-head h2,
+  .editorial-contribute h2,
+  .editorial-policy h2 {
+    margin: 0;
+    font-size: clamp(2rem, 4vw, 3.35rem);
+    font-weight: 830;
+    letter-spacing: -0.035em;
+    line-height: 1.12;
+    text-wrap: balance;
+  }
+
+  .editorial-section-head p,
+  .editorial-contribute-copy > p {
+    margin: 16px 0 0;
+    color: #475569;
+    font-size: 15px;
+    font-weight: 550;
+    line-height: 1.7;
+    word-break: keep-all;
+  }
+
+  .editorial-section-head > a {
+    display: inline-flex;
+    flex: 0 0 auto;
+    min-height: 44px;
+    align-items: center;
+    gap: 7px;
+    color: #1e3a8a;
+    font-size: 13px;
+    font-weight: 750;
+    white-space: nowrap;
+    text-decoration: none;
+  }
+
+  @media (max-width: 599px) {
+    .editorial-section-head {
+      display: block;
+    }
+
+    .editorial-section-head > a {
+      width: fit-content;
+      margin-top: 14px;
+    }
+  }
+
+  .editorial-post-list {
+    border-top: 1px solid #cbd5e1;
+  }
+
+  .editorial-post-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 16px;
+    padding: 26px 0;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .editorial-post-meta {
+    grid-column: 1 / -1;
+  }
+
+  .editorial-post-meta span {
+    color: #1e3a8a;
+  }
+
+  .editorial-post-copy {
+    display: grid;
+    align-content: center;
+    gap: 8px;
+    color: #0f172a;
+    text-decoration: none;
+  }
+
+  .editorial-post-copy strong {
+    font-size: 19px;
+    font-weight: 810;
+    letter-spacing: -0.02em;
+    line-height: 1.4;
+    word-break: keep-all;
+  }
+
+  .editorial-post-copy > span {
+    overflow: hidden;
+    color: #475569;
+    font-size: 13px;
+    font-weight: 550;
+    line-height: 1.6;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .editorial-post-copy:hover strong {
+    color: #1d4ed8;
+  }
+
+  .editorial-post-thumb {
+    display: block;
+    overflow: hidden;
+    width: 76px;
+    height: 76px;
+    border-radius: 12px;
+    background: #e2e8f0;
+  }
+
+  .editorial-post-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .editorial-post-arrow {
+    display: grid;
+    width: 44px;
+    height: 44px;
+    place-items: center;
+    align-self: center;
+    border: 1px solid #cbd5e1;
+    border-radius: 50%;
+    color: #1e3a8a;
+  }
+
+  .editorial-empty-row {
+    padding: 34px 0;
+    border-top: 1px solid #cbd5e1;
+    border-bottom: 1px solid #cbd5e1;
+  }
+
+  .editorial-empty-row p {
+    margin: 8px 0 0;
+    color: #64748b;
+  }
+
+  .editorial-categories {
+    background: #f8fafc;
+  }
+
+  .editorial-category-layout {
+    display: grid;
+    gap: 42px;
+  }
+
+  .editorial-category-head {
+    align-self: start;
+    margin-bottom: 0;
+  }
+
+  .editorial-category-list {
+    display: grid;
+    border-top: 1px solid #cbd5e1;
+  }
+
+  .editorial-category-list > a {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 20px;
+    min-height: 92px;
+    padding: 18px 0;
+    border-bottom: 1px solid #e2e8f0;
+    color: #0f172a;
+    text-decoration: none;
+  }
+
+  .editorial-category-list > a > span:first-child {
+    display: grid;
+    gap: 7px;
+  }
+
+  .editorial-category-list strong {
+    font-size: 17px;
+    font-weight: 800;
+  }
+
+  .editorial-category-list small {
+    color: #475569;
+    font-size: 12px;
+    font-weight: 550;
+    line-height: 1.55;
+  }
+
+  .editorial-category-count {
+    color: #1e3a8a;
+    font-size: 12px;
+    font-weight: 750;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .editorial-category-list > a:hover strong {
+    color: #1d4ed8;
+  }
+
+  .editorial-contribute {
+    background: #fff;
+  }
+
+  .editorial-contribute-grid {
+    display: grid;
+    gap: 64px;
+  }
+
+  .editorial-contribute-copy > p {
+    max-width: 540px;
+  }
+
+  .editorial-contribute-copy > div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 22px;
+    margin-top: 30px;
+  }
+
+  .editorial-contribute-copy a {
+    min-height: 40px;
+    padding: 10px 0 6px;
+    border-bottom: 1px solid #94a3b8;
+    color: #1e3a8a;
+    font-size: 13px;
+    font-weight: 750;
+    text-decoration: none;
+  }
+
+  .editorial-policy h2 {
+    font-size: 24px;
+  }
+
+  .editorial-policy ul {
+    display: grid;
+    margin: 24px 0 0;
+    padding: 0;
+    border-top: 1px solid #cbd5e1;
+    list-style: none;
+  }
+
+  .editorial-policy li {
+    display: grid;
+    gap: 6px;
+    padding: 19px 0;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .editorial-policy li strong {
+    font-size: 14px;
+    font-weight: 780;
+  }
+
+  .editorial-policy li span {
+    color: #475569;
+    font-size: 12px;
+    font-weight: 550;
+    line-height: 1.6;
+  }
+
+  @media (min-width: 760px) {
+    .editorial-post-row {
+      grid-template-columns: 150px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 24px;
+      padding: 24px 0;
+    }
+
+    .editorial-post-meta {
+      display: grid;
+      grid-column: auto;
+      gap: 7px;
+    }
+
+    .editorial-post-thumb {
+      width: 88px;
+      height: 72px;
+    }
+
+    .editorial-category-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: 32px;
+    }
+
+    .editorial-contribute-grid {
+      grid-template-columns: minmax(0, 1fr) minmax(340px, 0.9fr);
+      gap: 80px;
+    }
+  }
+
+  @media (min-width: 960px) {
+    .editorial-lead {
+      padding: 162px 0 92px;
+    }
+
+    .editorial-lead-grid {
+      grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.72fr);
+      gap: 80px;
+    }
+
+    .editorial-section {
+      padding: 116px 0;
+    }
+
+    .editorial-category-layout {
+      grid-template-columns: minmax(270px, 0.62fr) minmax(0, 1.38fr);
+      gap: 88px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .editorial-lead-image img {
+      transition: none;
+    }
+  }
+</style>
