@@ -1,77 +1,61 @@
 ---
-import { navGroups, site, type CategorySlug } from '../data/site'
+import { getOfficialHomeUrl, navGroups, site, type CategorySlug } from '../data/site'
 
 const currentPath = Astro.url.pathname
 const normalizedPath = currentPath.endsWith('/') ? currentPath : `${currentPath}/`
 const isHomePath = normalizedPath === '/blog/' || normalizedPath === '/'
 const isSlugActive = (slug: CategorySlug) => normalizedPath.startsWith(`/blog/category/${slug}/`)
+const officialHomeUrl = getOfficialHomeUrl()
 
 type NavGroup = (typeof navGroups)[number]
 
 const topLevelCategoryLinks = navGroups
   .filter((item): item is Extract<NavGroup, { type: 'link' }> => item.type === 'link')
-  .map((item) => ({
-    label: item.label,
-    href: item.href,
-    slug: item.slugs[0],
-  }))
+  .map((item) => ({ label: item.label, href: item.href, slug: item.slugs[0] }))
 
 const mobileNavGroups = [
-  {
-    label: '콘텐츠',
-    items: topLevelCategoryLinks,
-  },
+  { label: '콘텐츠', items: topLevelCategoryLinks },
   ...navGroups
     .filter((item): item is Extract<NavGroup, { type: 'group' }> => item.type === 'group')
-    .map((item) => ({
-      label: item.label,
-      items: item.items,
-    })),
+    .map((item) => ({ label: item.label, items: item.items })),
 ]
 ---
 
-<header
-  class:list={['site-header', { 'is-home': isHomePath }]}
-  data-site-header
->
-  <div class="shell header-inner">
-    <a class="brand" href="/blog/" aria-label={`${site.shortName} 블로그 홈`}>
-      <img class="brand-logo" src="/blog/logo-rect.png" alt="SSAFYnity" />
-      <span class="brand-copy">
+<header class:list={['blog-header-v2', { 'is-home': isHomePath }]} data-blog-header>
+  <div class="blog-header-shell">
+    <a class="blog-brand-v2" href="/blog/" aria-label={`${site.shortName} 공식 블로그 홈`}>
+      <img src="/blog/logo-rect.png" alt="" />
+      <span>
         <strong>{site.shortName}</strong>
-        <span>Alumni Association</span>
+        <small>공식 블로그</small>
       </span>
     </a>
 
-    <nav class="nav" aria-label="블로그 주요 메뉴">
+    <nav class="blog-desktop-nav" aria-label="블로그 주요 메뉴">
       {navGroups.map((item, index) =>
         item.type === 'link' ? (
           <a
-            class:list={['nav-link', { 'is-active': item.slugs.some((slug) => isSlugActive(slug)) }]}
+            class:list={['blog-nav-link', { 'is-active': item.slugs.some((slug) => isSlugActive(slug)) }]}
             href={item.href}
           >
             {item.label}
           </a>
         ) : (
-          <div class:list={['nav-group', { 'is-active': item.items.some((child) => isSlugActive(child.slug)) }]} data-nav-group>
+          <div class:list={['blog-nav-group', { 'is-active': item.items.some((child) => isSlugActive(child.slug)) }]} data-nav-group>
             <button
-              class="nav-group-trigger"
+              class="blog-nav-trigger"
               type="button"
               aria-expanded="false"
-              aria-controls={`nav-group-panel-${index}`}
-              data-nav-group-trigger
+              aria-haspopup="true"
+              aria-controls={`blog-nav-menu-${index}`}
+              data-nav-trigger
             >
               <span>{item.label}</span>
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="m6.75 9 5.25 5.25L17.25 9"></path>
-              </svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6.75 9 5.25 5.25L17.25 9"></path></svg>
             </button>
-            <div class="nav-group-menu" id={`nav-group-panel-${index}`} data-nav-group-menu hidden>
+            <div class="blog-nav-menu" id={`blog-nav-menu-${index}`} data-nav-menu hidden>
               {item.items.map((child) => (
-                <a
-                  class:list={['nav-group-link', { 'is-active': isSlugActive(child.slug) }]}
-                  href={child.href}
-                >
+                <a class:list={['blog-nav-menu-link', { 'is-active': isSlugActive(child.slug) }]} href={child.href}>
                   {child.label}
                 </a>
               ))}
@@ -81,184 +65,552 @@ const mobileNavGroups = [
       )}
     </nav>
 
+    <a class="blog-site-switch" href={officialHomeUrl}>
+      <span>공식 홈페이지</span>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"></path></svg>
+    </a>
+
     <button
-      class="mobile-nav-toggle"
+      class="blog-mobile-toggle"
       type="button"
       aria-label="메뉴 열기"
-      aria-controls="mobile-nav-drawer"
+      aria-controls="blog-mobile-drawer"
       aria-expanded="false"
-      data-mobile-nav-toggle
+      data-mobile-toggle
     >
-      <svg class="mobile-nav-toggle-open" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M4.5 7.5h15M4.5 12h15M4.5 16.5h15"></path>
-      </svg>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 7.5h15M4.5 12h15M4.5 16.5h15"></path></svg>
     </button>
   </div>
 
-  <div class="mobile-nav-backdrop" data-mobile-nav-backdrop></div>
-  <div
-    class="mobile-nav-drawer"
-    id="mobile-nav-drawer"
+  <div class="blog-mobile-backdrop" data-mobile-backdrop></div>
+  <aside
+    class="blog-mobile-drawer"
+    id="blog-mobile-drawer"
     aria-label="모바일 메뉴"
     aria-hidden="true"
-    data-mobile-nav-drawer
-    >
-    <div class="mobile-nav-shell">
-      <div class="mobile-nav-head">
-        <p class="mobile-nav-heading">메뉴</p>
-        <button
-          class="mobile-nav-close"
-          type="button"
-          aria-label="메뉴 닫기"
-          data-mobile-nav-close
-        >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="m6.75 6.75 10.5 10.5M17.25 6.75 6.75 17.25"></path>
-          </svg>
-        </button>
-      </div>
-      <div class="mobile-nav-group">
-        <nav class="mobile-nav-links" aria-label="모바일 블로그 메뉴">
-          {mobileNavGroups.map((group) => (
-            <div class="mobile-nav-section">
-              <p class="mobile-nav-title">{group.label}</p>
-              <div class="mobile-nav-group-links">
-                {group.items.map((child) => (
-                  <a
-                    class:list={['mobile-nav-link', 'is-child', { 'is-active': isSlugActive(child.slug) }]}
-                    href={child.href}
-                  >
-                    <span>{child.label}</span>
-                  </a>
-                ))}
-              </div>
-            </div>
-          ))}
-        </nav>
-      </div>
+    data-mobile-drawer
+  >
+    <div class="blog-mobile-head">
+      <a class="blog-brand-v2" href="/blog/" aria-label={`${site.shortName} 공식 블로그 홈`}>
+        <img src="/blog/logo-rect.png" alt="" />
+        <span>
+          <strong>{site.shortName}</strong>
+          <small>공식 블로그</small>
+        </span>
+      </a>
+      <button class="blog-mobile-close" type="button" aria-label="메뉴 닫기" data-mobile-close>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6.75 6.75 10.5 10.5M17.25 6.75 6.75 17.25"></path></svg>
+      </button>
     </div>
-  </div>
+
+    <a class="blog-mobile-switch" href={officialHomeUrl}>
+      <span>
+        <small>동문회 소개와 참여 안내</small>
+        <strong>공식 홈페이지로 이동</strong>
+      </span>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"></path></svg>
+    </a>
+
+    <nav class="blog-mobile-nav" aria-label="모바일 블로그 메뉴">
+      {mobileNavGroups.map((group) => (
+        <section class="blog-mobile-section">
+          <p>{group.label}</p>
+          <div>
+            {group.items.map((child) => (
+              <a class:list={['blog-mobile-link', { 'is-active': isSlugActive(child.slug) }]} href={child.href}>
+                {child.label}
+              </a>
+            ))}
+          </div>
+        </section>
+      ))}
+    </nav>
+  </aside>
 </header>
 
 <script>
-  const header = document.querySelector<HTMLElement>('[data-site-header]')
-  const menuToggle = header?.querySelector<HTMLButtonElement>('[data-mobile-nav-toggle]')
-  const menuClose = header?.querySelector<HTMLButtonElement>('[data-mobile-nav-close]')
-  const menuDrawer = header?.querySelector<HTMLElement>('[data-mobile-nav-drawer]')
-  const menuBackdrop = header?.querySelector<HTMLElement>('[data-mobile-nav-backdrop]')
-  const menuLinks = menuDrawer?.querySelectorAll<HTMLAnchorElement>('a') ?? []
+  const header = document.querySelector<HTMLElement>('[data-blog-header]')
+  const mobileToggle = header?.querySelector<HTMLButtonElement>('[data-mobile-toggle]')
+  const mobileClose = header?.querySelector<HTMLButtonElement>('[data-mobile-close]')
+  const mobileDrawer = header?.querySelector<HTMLElement>('[data-mobile-drawer]')
+  const mobileBackdrop = header?.querySelector<HTMLElement>('[data-mobile-backdrop]')
   const desktopGroups = header?.querySelectorAll<HTMLElement>('[data-nav-group]') ?? []
+  let desktopCloseTimer: number | undefined
+
+  const cancelDesktopClose = () => {
+    if (desktopCloseTimer === undefined) return
+    window.clearTimeout(desktopCloseTimer)
+    desktopCloseTimer = undefined
+  }
+
+  const closeDesktopGroups = () => {
+    cancelDesktopClose()
+    desktopGroups.forEach((group) => {
+      const trigger = group.querySelector<HTMLButtonElement>('[data-nav-trigger]')
+      const menu = group.querySelector<HTMLElement>('[data-nav-menu]')
+      group.classList.remove('is-open')
+      trigger?.setAttribute('aria-expanded', 'false')
+      if (menu) menu.hidden = true
+    })
+  }
+
+  const scheduleDesktopClose = () => {
+    cancelDesktopClose()
+    desktopCloseTimer = window.setTimeout(closeDesktopGroups, 160)
+  }
 
   const openDesktopGroup = (group: HTMLElement) => {
-    const trigger = group.querySelector<HTMLButtonElement>('[data-nav-group-trigger]')
-    const menu = group.querySelector<HTMLElement>('[data-nav-group-menu]')
+    const trigger = group.querySelector<HTMLButtonElement>('[data-nav-trigger]')
+    const menu = group.querySelector<HTMLElement>('[data-nav-menu]')
     if (!trigger || !menu) return
-
     closeDesktopGroups()
     group.classList.add('is-open')
     trigger.setAttribute('aria-expanded', 'true')
     menu.hidden = false
   }
 
-  const closeDesktopGroups = () => {
-    desktopGroups.forEach((group) => {
-      const trigger = group.querySelector<HTMLButtonElement>('[data-nav-group-trigger]')
-      const menu = group.querySelector<HTMLElement>('[data-nav-group-menu]')
-      group.classList.remove('is-open')
-      trigger?.setAttribute('aria-expanded', 'false')
-      if (menu) {
-        menu.hidden = true
-      }
-    })
-  }
+  const setMobileOpen = (open: boolean) => {
+    if (!header || !mobileToggle || !mobileDrawer || !mobileBackdrop) return
+    const isCurrentlyOpen = header.classList.contains('is-mobile-open')
+    if (open === isCurrentlyOpen) return
+    const scrollY = window.scrollY
+    header.classList.toggle('is-mobile-open', open)
+    mobileToggle.setAttribute('aria-expanded', open ? 'true' : 'false')
+    mobileDrawer.setAttribute('aria-hidden', open ? 'false' : 'true')
 
-  const closeMobileMenu = () => {
-    if (!header || !menuToggle || !menuDrawer || !menuBackdrop) return
+    if (open) {
+      document.body.dataset.scrollY = String(scrollY)
+      document.body.style.top = `-${scrollY}px`
+      document.body.classList.add('is-mobile-nav-open')
+      mobileClose?.focus()
+      return
+    }
+
     const savedScrollY = Number(document.body.dataset.scrollY || '0')
-
-    header.classList.remove('is-mobile-open')
-    menuToggle.setAttribute('aria-expanded', 'false')
-    menuDrawer.setAttribute('aria-hidden', 'true')
     document.body.classList.remove('is-mobile-nav-open')
     document.body.style.top = ''
     delete document.body.dataset.scrollY
     window.scrollTo(0, savedScrollY)
+    mobileToggle.focus()
   }
 
-  const openMobileMenu = () => {
-    if (!header || !menuToggle || !menuDrawer || !menuBackdrop) return
-    const scrollY = window.scrollY
-
-    header.classList.add('is-mobile-open')
-    menuToggle.setAttribute('aria-expanded', 'true')
-    menuDrawer.setAttribute('aria-hidden', 'false')
-    document.body.dataset.scrollY = String(scrollY)
-    document.body.style.top = `-${scrollY}px`
-    document.body.classList.add('is-mobile-nav-open')
-  }
-
-  if (header) {
-    const isHome = header.classList.contains('is-home')
-
-    const syncScrolled = () => {
-      header.classList.toggle('is-scrolled', window.scrollY > 20 || !isHome)
-    }
-
-    syncScrolled()
-    window.addEventListener('scroll', syncScrolled, { passive: true })
-  }
-
-  menuToggle?.addEventListener('click', () => {
-    const isOpen = header?.classList.contains('is-mobile-open')
-
-    if (isOpen) {
-      closeMobileMenu()
-      return
-    }
-
-    openMobileMenu()
-  })
-
-  menuBackdrop?.addEventListener('click', closeMobileMenu)
-  menuClose?.addEventListener('click', closeMobileMenu)
+  const syncScrolled = () => header?.classList.toggle('is-scrolled', window.scrollY > 20)
+  syncScrolled()
+  window.addEventListener('scroll', syncScrolled, { passive: true })
 
   desktopGroups.forEach((group) => {
-    const trigger = group.querySelector<HTMLButtonElement>('[data-nav-group-trigger]')
-    const menu = group.querySelector<HTMLElement>('[data-nav-group-menu]')
-
-    if (!trigger || !menu) return
-
+    const trigger = group.querySelector<HTMLButtonElement>('[data-nav-trigger]')
     group.addEventListener('mouseenter', () => {
-      if (window.innerWidth < 1024) return
+      cancelDesktopClose()
       openDesktopGroup(group)
     })
-
-    group.addEventListener('mouseleave', () => {
-      if (window.innerWidth < 1024) return
+    group.addEventListener('mouseleave', scheduleDesktopClose)
+    group.addEventListener('focusin', cancelDesktopClose)
+    group.addEventListener('focusout', (event) => {
+      if (event.relatedTarget instanceof Node && group.contains(event.relatedTarget)) return
+      scheduleDesktopClose()
+    })
+    group.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape' || !group.classList.contains('is-open')) return
+      event.preventDefault()
+      event.stopPropagation()
       closeDesktopGroups()
+      trigger?.focus()
+    })
+    trigger?.addEventListener('click', (event) => {
+      const keyboardToggleClose = event.detail === 0 && group.classList.contains('is-open')
+      keyboardToggleClose ? closeDesktopGroups() : openDesktopGroup(group)
+    })
+    trigger?.addEventListener('keydown', (event) => {
+      if (event.key !== 'ArrowDown') return
+      event.preventDefault()
+      openDesktopGroup(group)
+      group.querySelector<HTMLAnchorElement>('[data-nav-menu] a')?.focus()
     })
   })
 
-  menuLinks.forEach((link) => {
-    link.addEventListener('click', closeMobileMenu)
-  })
+  mobileToggle?.addEventListener('click', () => setMobileOpen(true))
+  mobileClose?.addEventListener('click', () => setMobileOpen(false))
+  mobileBackdrop?.addEventListener('click', () => setMobileOpen(false))
+  mobileDrawer?.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => setMobileOpen(false)))
 
   document.addEventListener('click', (event) => {
-    if (!(event.target instanceof Node) || !header) return
-    if (header.contains(event.target)) return
+    if (!(event.target instanceof Node) || !header || header.contains(event.target)) return
     closeDesktopGroups()
   })
 
   window.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') {
-      closeDesktopGroups()
-      closeMobileMenu()
-    }
+    if (event.key !== 'Escape') return
+    closeDesktopGroups()
+    setMobileOpen(false)
   })
 
   window.addEventListener('resize', () => {
-    if (window.innerWidth >= 1024) {
-      closeMobileMenu()
-    }
+    if (window.innerWidth >= 1024) setMobileOpen(false)
   })
 </script>
+
+<style>
+  .blog-header-v2 {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 50;
+    padding-top: env(safe-area-inset-top);
+    border-bottom: 1px solid transparent;
+    background: transparent;
+    transition: background-color 180ms ease, border-color 180ms ease;
+  }
+
+  .blog-header-v2:not(.is-home),
+  .blog-header-v2.is-scrolled,
+  .blog-header-v2.is-mobile-open {
+    border-color: #e2e8f0;
+    background: rgba(255, 255, 255, 0.98);
+  }
+
+  .blog-header-shell {
+    display: flex;
+    width: min(100% - 32px, 1180px);
+    min-height: 76px;
+    align-items: center;
+    gap: 24px;
+    margin-inline: auto;
+  }
+
+  .blog-brand-v2 {
+    display: inline-flex;
+    flex: 0 0 auto;
+    min-height: 44px;
+    align-items: center;
+    gap: 10px;
+    color: #0f172a;
+    text-decoration: none;
+  }
+
+  .blog-brand-v2 img {
+    width: auto;
+    height: 34px;
+  }
+
+  .blog-brand-v2 > span {
+    display: grid;
+    gap: 3px;
+    line-height: 1;
+  }
+
+  .blog-brand-v2 strong {
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  .blog-brand-v2 small {
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+  }
+
+  .blog-desktop-nav {
+    display: none;
+    align-items: stretch;
+    gap: 2px;
+    margin-left: auto;
+  }
+
+  .blog-nav-group {
+    position: relative;
+  }
+
+  .blog-nav-link,
+  .blog-nav-trigger {
+    position: relative;
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    gap: 5px;
+    padding: 0 14px;
+    border: 0;
+    background: transparent;
+    color: #475569;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .blog-nav-link::after,
+  .blog-nav-trigger::after {
+    position: absolute;
+    right: 12px;
+    bottom: 3px;
+    left: 12px;
+    height: 2px;
+    background: #1e3a8a;
+    content: '';
+    opacity: 0;
+    transform: scaleX(0.45);
+    transition: opacity 160ms ease, transform 160ms ease;
+  }
+
+  .blog-nav-link:is(:hover, .is-active),
+  .blog-nav-group:is(.is-active, .is-open) .blog-nav-trigger,
+  .blog-nav-trigger:hover {
+    color: #0f172a;
+  }
+
+  .blog-nav-link.is-active::after,
+  .blog-nav-group:is(.is-active, .is-open) .blog-nav-trigger::after {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+
+  .blog-nav-trigger svg,
+  .blog-site-switch svg,
+  .blog-mobile-toggle svg,
+  .blog-mobile-close svg,
+  .blog-mobile-switch svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .blog-nav-group.is-open .blog-nav-trigger svg {
+    transform: rotate(180deg);
+  }
+
+  .blog-nav-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    width: 168px;
+    padding: 7px;
+    border: 1px solid #cbd5e1;
+    border-radius: 14px;
+    background: #fff;
+    transform: translateX(-50%);
+  }
+
+  .blog-nav-menu::before {
+    position: absolute;
+    right: 0;
+    bottom: 100%;
+    left: 0;
+    height: 9px;
+    content: '';
+  }
+
+  .blog-nav-menu-link {
+    display: flex;
+    min-height: 40px;
+    align-items: center;
+    padding: 9px 11px;
+    border-radius: 8px;
+    color: #475569;
+    font-size: 13px;
+    font-weight: 650;
+    text-decoration: none;
+  }
+
+  .blog-nav-menu-link:is(:hover, :focus-visible, .is-active) {
+    background: #eff6ff;
+    color: #1e3a8a;
+  }
+
+  .blog-site-switch {
+    display: none;
+    min-height: 40px;
+    align-items: center;
+    gap: 7px;
+    padding: 0 13px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    color: #1e3a8a;
+    font-size: 13px;
+    font-weight: 750;
+    text-decoration: none;
+  }
+
+  .blog-site-switch:hover {
+    border-color: #1e3a8a;
+    background: #eff6ff;
+  }
+
+  .blog-mobile-toggle,
+  .blog-mobile-close {
+    display: inline-grid;
+    width: 44px;
+    height: 44px;
+    place-items: center;
+    margin-left: auto;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    background: #fff;
+    color: #0f172a;
+    cursor: pointer;
+  }
+
+  .blog-mobile-toggle svg,
+  .blog-mobile-close svg {
+    width: 21px;
+    height: 21px;
+  }
+
+  .blog-mobile-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 55;
+    background: rgba(15, 23, 42, 0.48);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 180ms ease;
+  }
+
+  .blog-mobile-drawer {
+    position: fixed;
+    z-index: 60;
+    inset: 0 0 0 auto;
+    width: min(100%, 420px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: calc(20px + env(safe-area-inset-top)) 20px calc(32px + env(safe-area-inset-bottom));
+    background: #fff;
+    transform: translateX(100%);
+    transition: transform 220ms ease;
+  }
+
+  .blog-header-v2.is-mobile-open .blog-mobile-backdrop {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .blog-header-v2.is-mobile-open .blog-mobile-drawer {
+    transform: translateX(0);
+  }
+
+  .blog-mobile-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .blog-mobile-close {
+    margin-left: 0;
+  }
+
+  .blog-mobile-switch {
+    display: flex;
+    min-height: 68px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 18px 0 22px;
+    padding: 12px 14px;
+    border: 1px solid #bfdbfe;
+    border-radius: 12px;
+    background: #eff6ff;
+    color: #1e3a8a;
+    text-decoration: none;
+  }
+
+  .blog-mobile-switch > span {
+    display: grid;
+    gap: 3px;
+  }
+
+  .blog-mobile-switch small {
+    color: #475569;
+    font-size: 11px;
+    font-weight: 650;
+  }
+
+  .blog-mobile-switch strong {
+    font-size: 14px;
+    font-weight: 800;
+  }
+
+  .blog-mobile-switch svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .blog-mobile-nav {
+    display: grid;
+  }
+
+  .blog-mobile-section {
+    display: grid;
+    grid-template-columns: 88px minmax(0, 1fr);
+    gap: 12px;
+    padding: 17px 0;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .blog-mobile-section > p {
+    margin: 10px 0 0;
+    color: #0f172a;
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .blog-mobile-section > div {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2px 6px;
+  }
+
+  .blog-mobile-link {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    padding: 8px;
+    border-radius: 8px;
+    color: #475569;
+    font-size: 13px;
+    font-weight: 650;
+    text-decoration: none;
+  }
+
+  .blog-mobile-link:is(:hover, :focus-visible, .is-active) {
+    background: #eff6ff;
+    color: #1e3a8a;
+  }
+
+  :global(body.is-mobile-nav-open) {
+    position: fixed;
+    right: 0;
+    left: 0;
+    overflow: hidden;
+  }
+
+  @media (min-width: 1024px) {
+    .blog-desktop-nav,
+    .blog-site-switch {
+      display: flex;
+    }
+
+    .blog-mobile-toggle,
+    .blog-mobile-backdrop,
+    .blog-mobile-drawer {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .blog-header-v2,
+    .blog-nav-link::after,
+    .blog-nav-trigger::after,
+    .blog-mobile-backdrop,
+    .blog-mobile-drawer {
+      transition: none;
+    }
+  }
+</style>

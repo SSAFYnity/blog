@@ -17,6 +17,7 @@ export const site = {
   ogImage: 'https://ssafynity.github.io/blog/logo-rect.png',
   links: {
     home: 'https://ssafynity.github.io',
+    developmentHome: 'http://127.0.0.1:4331',
     policyPaths: {
       privacy: '/privacy',
       terms: '/terms',
@@ -98,7 +99,8 @@ export const site = {
   ],
 } as const
 
-export const getOfficialUrl = (path: string) => `${site.links.home}${path}`
+export const getOfficialHomeUrl = () => import.meta.env.DEV ? site.links.developmentHome : site.links.home
+export const getOfficialUrl = (path: string) => `${getOfficialHomeUrl()}${path}`
 
 const FILE_PATH_PATTERN = /\/[^/]+\.[a-z0-9]+$/i
 
