@@ -123,10 +123,9 @@ const clubGroups =
   title={`${categoryInfo.title} | 싸피니티 SSAFYnity 블로그`}
   description={categoryInfo.description}
 >
-  <section class="archive-hero-band archive-hero-band-category">
-    <div class="archive-hero archive-hero-category shell">
+  <section class="archive-hero-band archive-hero-band-category step4-category-intro">
+    <div class="archive-hero archive-hero-category step4-category-hero shell">
       <div>
-        <p class="eyebrow">Category</p>
         <h1>{categoryInfo.title}</h1>
         <p class="archive-copy">{categoryInfo.description}</p>
       </div>
@@ -143,8 +142,8 @@ const clubGroups =
     </div>
   </section>
 
-  <section class="section section-muted archive-section-band">
-    <div class="shell archive-section">
+  <section class="section section-muted archive-section-band step4-category-surface">
+    <div class="shell archive-section step4-category-content">
     {posts.length > 0 && category.slug !== 'series' && category.slug !== 'club' && <div class="archive-controls">
       {category.slug === 'review' && (
         <div class="archive-dropdown" data-dropdown>

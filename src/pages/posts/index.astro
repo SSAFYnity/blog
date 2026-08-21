@@ -1,39 +1,99 @@
 ---
 import { getCollection } from 'astro:content'
 import BaseLayout from '../../layouts/BaseLayout.astro'
-import PostCard from '../../components/PostCard.astro'
+import { getCategoryTitle } from '../../data/site'
 import { isPublicPost } from '../../lib/content'
 
 const posts = (await getCollection('posts'))
   .filter(isPublicPost)
   .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime())
+
+const formatDate = (date: Date) => new Intl.DateTimeFormat('ko-KR', {
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+}).format(date)
 ---
 
 <BaseLayout title="전체 글 | 싸피니티 SSAFYnity 블로그" description="싸피니티(SSAFYnity) 블로그의 전체 글 목록입니다.">
-  <section class="archive-hero-band">
-    <div class="archive-hero shell">
-      <p class="eyebrow">All Posts</p>
+  <section class="all-posts-intro">
+    <div class="all-posts-shell">
       <h1>전체 글</h1>
-      <p class="archive-copy">공지, 일지, 동아리, 연재, 기술, 후기, 회비 기록을 한곳에서 모아볼 수 있습니다.</p>
+      <p>공지, 일지, 동아리, 연재, 기술, 후기, 회비 기록을 공개일 순서로 모았습니다.</p>
     </div>
   </section>
 
-  <section class="section section-muted archive-section-band">
-    <div class="shell archive-section">
-      <div class="post-grid">
+  <section class="all-posts-surface">
+    <div class="all-posts-shell">
+      <div class="all-posts-list">
         {posts.map((post) => (
-          <PostCard
-            href={`/blog/${post.slug}/`}
-            slug={post.slug}
-            title={post.data.title}
-            description={post.data.description}
-            pubDate={post.data.pubDate}
-            category={post.data.category}
-            coverImage={post.data.coverImage}
-            tags={post.data.tags}
-          />
+          <article class="all-posts-row">
+            <div class="all-posts-meta">
+              <span>{getCategoryTitle(post.data.category)}</span>
+              <time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate)}</time>
+            </div>
+            <a
+              class="all-posts-copy"
+              href={`/blog/${post.slug}/`}
+              data-analytics-event="select_blog_post"
+              data-analytics-payload={JSON.stringify({
+                post_slug: post.slug,
+                post_title: post.data.title,
+                post_category: post.data.category,
+                destination_url: `/blog/${post.slug}/`,
+                source_area: 'all_posts',
+              })}
+            >
+              <h2>{post.data.title}</h2>
+              {post.data.description && <p>{post.data.description}</p>}
+            </a>
+            {post.data.coverImage ? (
+              <a class="all-posts-image" href={`/blog/${post.slug}/`} aria-label={`${post.data.title} 대표 이미지`}>
+                <img src={post.data.coverImage} alt="" loading="lazy" />
+              </a>
+            ) : (
+              <a class="all-posts-arrow" href={`/blog/${post.slug}/`} aria-label={`${post.data.title} 읽기`}>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"></path></svg>
+              </a>
+            )}
+          </article>
         ))}
       </div>
     </div>
   </section>
 </BaseLayout>
+
+<style>
+  .all-posts-intro { padding: 150px 0 72px; border-bottom: 1px solid var(--color-border); background: var(--color-surface); }
+  .all-posts-shell { width: min(100% - 40px, 1180px); margin-inline: auto; }
+  .all-posts-intro h1 { margin: 0; font-size: clamp(2.8rem, 5.4vw, 4.8rem); font-weight: 850; letter-spacing: -0.035em; line-height: 1; }
+  .all-posts-intro p { max-width: 42rem; margin: 24px 0 0; color: var(--color-text-body); font-size: 16px; font-weight: 550; line-height: 1.75; word-break: keep-all; }
+  .all-posts-surface { padding: 52px 0 104px; background: var(--color-canvas); }
+  .all-posts-list { border-top: 1px solid var(--color-border-strong); }
+  .all-posts-row { display: grid; grid-template-columns: 150px minmax(0, 1fr) auto; align-items: center; gap: 28px; min-height: 154px; padding: 24px 0; border-bottom: 1px solid var(--color-border); }
+  .all-posts-meta { display: grid; gap: 8px; color: var(--color-text-muted); font-size: 12px; font-weight: 700; }
+  .all-posts-meta span { color: var(--color-primary-strong); }
+  .all-posts-meta time { font-variant-numeric: tabular-nums; }
+  .all-posts-copy { min-width: 0; }
+  .all-posts-copy h2 { margin: 0; font-size: 20px; font-weight: 810; letter-spacing: -0.025em; line-height: 1.4; transition: color var(--duration-quick) var(--ease-out); }
+  .all-posts-copy p { overflow: hidden; margin: 10px 0 0; color: var(--color-text-body); font-size: 13px; font-weight: 550; line-height: 1.65; text-overflow: ellipsis; white-space: nowrap; }
+  .all-posts-copy:hover h2 { color: var(--color-primary-hover); }
+  .all-posts-image { display: block; overflow: hidden; width: 112px; aspect-ratio: 16 / 10; border-radius: 12px; background: var(--color-border); }
+  .all-posts-image img { width: 100%; height: 100%; object-fit: cover; transition: transform var(--duration-standard) var(--ease-out); }
+  .all-posts-image:hover img { transform: scale(1.02); }
+  .all-posts-arrow { display: grid; width: 44px; height: 44px; place-items: center; color: var(--color-primary-strong); }
+  .all-posts-arrow svg { width: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  @media (max-width: 720px) {
+    .all-posts-intro { padding: 122px 0 52px; }
+    .all-posts-shell { width: min(100% - 32px, 1180px); }
+    .all-posts-surface { padding: 34px 0 72px; }
+    .all-posts-row { grid-template-columns: minmax(0, 1fr) auto; gap: 16px; min-height: 0; padding: 22px 0; }
+    .all-posts-meta { grid-column: 1 / -1; display: flex; gap: 12px; }
+    .all-posts-copy h2 { font-size: 17px; }
+    .all-posts-copy p { display: none; }
+    .all-posts-image { width: 78px; aspect-ratio: 1; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .all-posts-copy h2, .all-posts-image img { transition: none; }
+  }
+</style>
