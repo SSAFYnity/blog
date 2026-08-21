@@ -39,10 +39,17 @@ npm run dev
 
 ## 기본 구조
 
+- `docs/design-system.md`: 블로그 저장소 안에서 완결되는 디자인 토큰과 UI 사용 기준
 - `src/layouts`: 공통 레이아웃
 - `src/components`: 헤더, 푸터, 포스트 카드
 - `src/content/posts`: 카테고리별 Markdown 포스트
 - `src/styles/global.css`: 메인 사이트와 톤을 맞춘 글로벌 스타일
+
+## 디자인 시스템
+
+- 블로그의 디자인 기준은 [`docs/design-system.md`](docs/design-system.md)를 따릅니다.
+- 디자인 토큰은 `src/styles/global.css`에 저장소 내부 값으로 선언합니다.
+- 공식 홈페이지나 상위 작업공간 파일을 import하지 않으며, 이 저장소만으로 `/blog` 경로를 빌드·배포할 수 있어야 합니다.
 
 ## 문의
 
