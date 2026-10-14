@@ -11,7 +11,10 @@ import { getPostEventSlug } from '../lib/archive'
 import { isPublicPost } from '../lib/content'
 
 export async function getStaticPaths() {
-  const posts = (await getCollection('posts')).filter(isPublicPost)
+  const posts = (await getCollection('posts')).filter((post) =>
+    isPublicPost(post) ||
+    (import.meta.env.DEV && post.data.draft && !post.slug.split('/').at(-1)?.startsWith('_')),
+  )
 
   return posts.map((post) => ({
     params: { slug: post.slug },
@@ -109,6 +112,7 @@ const seoDescription = explicitDescription || (
       <header class:list={['post-detail-header', post.data.category === 'journal' && 'is-journal']}>
         <div class="post-detail-header-copy">
           <div class="post-meta-row">
+            {post.data.draft && <Badge tone={categoryStyles.notice}>초안 · 로컬 미리보기</Badge>}
             {seriesBackHref && seriesBackLabel ? (
               <Badge
                 as="a"
