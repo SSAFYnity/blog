@@ -44,7 +44,7 @@ export const eventArchive = [
   { slug: '2026-night-of-ssafynity', title: '제4회 싸피인의 밤', kind: 'regular', eventDateLabel: '2026년 6월 27일 · 13:30 - 22:00' },
   { slug: '2026-metcha-chameleon-tournament', title: '멧챠 카멜레온 대전', kind: 'ongoing', eventDateLabel: '2026년 8월 30일 · 20:00' },
   { slug: '2026-hangang-chicken', title: '9월 정회원 한강치킨모임', kind: 'ongoing', eventDateLabel: '2026년 9월 20일 · 15:00 - 19:00' },
-  { slug: '2026-second-half-regular-event', title: '하반기 정기행사 - IT 공개 행사', kind: 'regular' },
+  { slug: '2026-ssafynale', title: '제4회 SSAFYnale', kind: 'regular', eventDateLabel: '2026년 11월 22일 · 13:00' },
 ] as const satisfies readonly EventArchiveItem[]
 
 export const eventKindLabels = {
